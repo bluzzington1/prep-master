@@ -40,7 +40,7 @@
 </head>
 <body id="app-body" class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans relative">
 
-  <!-- CANVAS LỄ HỘI -->
+  <!-- CANVAS LỄ HỘI (AN TOÀN TUYỆT ĐỐI) -->
   <canvas id="holiday-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 40;"></canvas>
 
   <!-- BANNER LỄ HỘI -->
@@ -101,7 +101,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Thư Viện Đề Thi Trực Tuyến</h1>
-          <p class="text-slate-500 mt-1 text-sm">Đề thi và kết quả được đồng bộ tự động trên toàn bộ các thiết bị qua Đám Mây.</p>
+          <p class="text-slate-500 mt-1 text-sm">Học sinh đăng nhập để làm bài. Kết quả được lưu tự động cho Giáo viên.</p>
         </div>
         
         <button id="add-exam-btn" onclick="openExamModal()" class="hidden px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm items-center gap-2 transition shadow-lg shadow-indigo-600/30 shrink-0">
@@ -275,7 +275,7 @@
       </div>
     </section>
 
-    <!-- MODAL ĐĂNG NHẬP THÔNG MINH -->
+    <!-- MODAL ĐĂNG NHẬP -->
     <div id="login-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
         <button onclick="closeLoginModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 text-xl">
@@ -568,7 +568,7 @@ const firebaseConfig = {
 
     // 👉 EMAIL GIÁO VIÊN CỦA BẠN:
     const TEACHER_EMAILS = [
-      "bluzzington1@gmail.",
+      "bluzzington1@gmail.com",
       "bluzzington1@gmail.com"
     ];
 
@@ -682,7 +682,7 @@ const firebaseConfig = {
     }
 
     /* -------------------------------------------------------------
-       3. ĐỒNG BỘ ĐỀ THI ĐA THIẾT BỊ QUA CLOUD FIRESTORE
+       3. DANH SÁCH ĐỀ THI MẪU & BỘ TỰ ĐỘNG BẢO TOÀN DỮ LIỆU
        ------------------------------------------------------------- */
     let EXAMS_DATABASE = [
       {
@@ -710,24 +710,89 @@ const firebaseConfig = {
             explanation: "Đoạn văn nêu: 'boost dopamine levels'."
           }
         ]
+      },
+      {
+        id: "ielts-full-reading-demo",
+        title: "IELTS Academic Reading: The Future of Renewable Energy",
+        category: "IELTS",
+        difficulty: "Hard",
+        year: "2026",
+        durationMinutes: 20,
+        passage: `<h3 class="text-lg font-bold text-slate-900 mb-2">Renewable Energy Systems</h3><p>Paragraph A: Photovoltaic solar energy cost dropped 85%. Paragraph B: Offshore wind turbines face storms.</p>`,
+        questions: [
+          {
+            id: 1,
+            type: "matching_heading",
+            prompt: "Chọn tiêu đề phù hợp nhất cho Paragraph A:",
+            headingsList: [
+              "i. The engineering challenges of deep ocean energy",
+              "ii. A steep decline in solar production expenditure"
+            ],
+            correctAnswer: "ii. A steep decline in solar production expenditure",
+            explanation: "Paragraph A nói về chi phí quang điện giảm hơn 85%."
+          },
+          {
+            id: 2,
+            type: "tfng",
+            prompt: "Solar energy is completely free to install for everyone worldwide.",
+            correctAnswer: "NOT GIVEN",
+            explanation: "Bài đọc không hề nói về việc lắp đặt miễn phí trên toàn thế giới."
+          }
+        ]
       }
     ];
 
-    // 👉 HÀM ĐỒNG BỘ ĐỀ THI TỪ ĐÁM MÂY VỀ MỌI THIẾT BỊ (REALTIME)
+    // 👉 TỰ ĐỘNG KHÔI PHỤC TOÀN BỘ ĐỀ CŨ VÀ ĐẢM BẢO LUÔN CÓ MÃ ID
+    function recoverLocalExams() {
+      const allPossibleKeys = [
+        "prep_custom_exams_v7", "prep_custom_exams_v6", "prep_custom_exams_v5",
+        "prep_custom_exams_v4", "prep_custom_exams_v3", "prep_custom_exams_v2",
+        "prep_custom_exams", "custom_exams"
+      ];
+
+      for (let k of allPossibleKeys) {
+        const data = localStorage.getItem(k);
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              parsed.forEach(oldExam => {
+                if (oldExam && typeof oldExam === 'object') {
+                  if (!oldExam.id) oldExam.id = "exam-" + Math.random().toString(36).substr(2, 9);
+                  if (!EXAMS_DATABASE.some(e => e.id === oldExam.id)) {
+                    EXAMS_DATABASE.push(oldExam);
+                  }
+                }
+              });
+            }
+          } catch(e){}
+        }
+      }
+    }
+    recoverLocalExams();
+
+    // 👉 ĐỒNG BỘ ĐỀ THI LÊN ĐÁM MÂY (FIRESTORE) VÀ TẢI VỀ CÁC MÁY KHÁC
     function syncExamsFromCloud() {
       if (db) {
         db.collection("exams").onSnapshot(snapshot => {
           if (!snapshot.empty) {
             const cloudExams = [];
             snapshot.forEach(doc => {
-              cloudExams.push({ id: doc.id, ...doc.data() });
+              const d = doc.data();
+              d.id = doc.id;
+              cloudExams.push(d);
             });
-            EXAMS_DATABASE = cloudExams;
+            cloudExams.forEach(ce => {
+              const idx = EXAMS_DATABASE.findIndex(e => e.id === ce.id);
+              if (idx >= 0) EXAMS_DATABASE[idx] = ce;
+              else EXAMS_DATABASE.push(ce);
+            });
             renderExamList();
           } else {
-            // Nếu trên đám mây chưa có đề nào, tải đề mẫu lên
             EXAMS_DATABASE.forEach(ex => {
-              db.collection("exams").doc(ex.id).set(ex);
+              if (ex && ex.id) {
+                db.collection("exams").doc(ex.id).set(ex);
+              }
             });
             renderExamList();
           }
@@ -755,6 +820,11 @@ const firebaseConfig = {
       }
 
       currentExam = EXAMS_DATABASE.find(e => e.id === examId);
+      if (!currentExam) {
+        alert("Không tìm thấy đề thi này!");
+        return;
+      }
+
       currentQuestionIdx = 0;
       userAnswers = {};
       flaggedQuestions.clear();
@@ -833,6 +903,8 @@ const firebaseConfig = {
     function renderQuestionPalette() {
       const palette = document.getElementById('question-palette');
       palette.innerHTML = '';
+      if (!currentExam || !currentExam.questions) return;
+
       currentExam.questions.forEach((q, idx) => {
         const btn = document.createElement('button');
         const isCurrent = idx === currentQuestionIdx;
@@ -852,6 +924,7 @@ const firebaseConfig = {
     }
 
     function renderCurrentQuestion() {
+      if (!currentExam || !currentExam.questions) return;
       const q = currentExam.questions[currentQuestionIdx];
       const container = document.getElementById('question-container');
       
@@ -891,7 +964,6 @@ const firebaseConfig = {
           </div>
         `;
       } else if (q.type === 'fill_blank') {
-        // Gõ chữ không bao giờ mất tiêu điểm
         const val = userAnswers[q.id] || '';
         inputHtml = `
           <div class="mt-5">
@@ -1057,7 +1129,6 @@ const firebaseConfig = {
         dateFormatted: new Date().toLocaleTimeString() + " - " + new Date().toLocaleDateString()
       };
 
-      // Đẩy lên Firestore để các máy khác (máy giáo viên) nhận được
       if (db) {
         db.collection("submissions").add({
           ...submissionData,
@@ -1237,7 +1308,7 @@ const firebaseConfig = {
       builderQuestions[idx]._deleted = true;
     }
 
-    // 👉 HÀM LƯU ĐỀ THI LÊN ĐÁM MÂY FIRESTORE ĐỂ TẤT CẢ CÁC MÁY KHÁC ĐỀU THẤY
+    // 👉 LƯU ĐỀ THI LÊN ĐÁM MÂY (CHẮC CHẮN CÓ MÃ ID)
     function saveExamFromBuilder() {
       if (!isTeacher) {
         alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên!");
@@ -1342,7 +1413,9 @@ const firebaseConfig = {
         return;
       }
 
+      // ĐẢM BẢO CÓ ĐỦ ID
       const examData = {
+        id: examId,
         title: title,
         category: category,
         difficulty: level,
@@ -1352,34 +1425,44 @@ const firebaseConfig = {
         questions: questions
       };
 
-      // ĐẨY TRỰC TIẾP LÊN CLOUD FIRESTORE
+      // 1. Cập nhật ngay trên máy này
+      const existIdx = EXAMS_DATABASE.findIndex(e => e.id === examId);
+      if (existIdx >= 0) EXAMS_DATABASE[existIdx] = examData;
+      else EXAMS_DATABASE.unshift(examData);
+
+      localStorage.setItem("prep_custom_exams_v8", JSON.stringify(EXAMS_DATABASE));
+      renderExamList();
+
+      // 2. ĐẨY LÊN CLOUD FIRESTORE
       if (db) {
         db.collection("exams").doc(examId).set(examData).then(() => {
-          alert(`🎉 Đã lưu và đồng bộ đề thi "${title}" lên Đám Mây! Tất cả học sinh và thiết bị khác sẽ thấy ngay.`);
+          alert(`🎉 Đã lưu và đồng bộ đề thi "${title}" lên Đám Mây thành công! Mọi thiết bị khác sẽ thấy ngay.`);
           closeExamModal();
         }).catch(err => {
-          alert("Lỗi lưu lên đám mây: " + err.message + "\n👉 Hãy kiểm tra lại tab Rules trong Firestore Database đã mở quyền chưa nhé.");
+          alert("Lỗi Firestore: " + err.message + "\n(Vui lòng mở tab Rules trong Firestore thành allow read, write: if true;)");
+          closeExamModal();
         });
       } else {
-        alert("⚠️ Bạn chưa kết nối Firebase nên chỉ lưu trên máy này. Hãy điền mã Firebase để đồng bộ sang các máy khác.");
+        alert("Đã lưu vào máy hiện tại! Hãy điền mã Firebase để đồng bộ tự động sang các máy khác.");
+        closeExamModal();
       }
     }
 
-    // 👉 HÀM XÓA ĐỀ THI TRÊN ĐÁM MÂY
     function deleteExam(examId, examTitle) {
       if (!isTeacher) {
         alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên!");
         return;
       }
 
-      if (confirm(`Bạn có chắc muốn xóa đề thi "${examTitle}" trên toàn bộ hệ thống các thiết bị không?`)) {
+      if (confirm(`Bạn có chắc muốn xóa đề thi "${examTitle}" trên toàn bộ hệ thống không?`)) {
+        EXAMS_DATABASE = EXAMS_DATABASE.filter(e => e.id !== examId);
+        localStorage.setItem("prep_custom_exams_v8", JSON.stringify(EXAMS_DATABASE));
+        renderExamList();
+
         if (db) {
           db.collection("exams").doc(examId).delete().then(() => {
-            alert(`Đã xóa đề thi "${examTitle}" khỏi toàn bộ các thiết bị!`);
+            alert(`Đã xóa đề thi "${examTitle}" khỏi Đám Mây!`);
           }).catch(err => alert("Lỗi xóa: " + err.message));
-        } else {
-          EXAMS_DATABASE = EXAMS_DATABASE.filter(e => e.id !== examId);
-          renderExamList();
         }
       }
     }
@@ -1435,7 +1518,7 @@ const firebaseConfig = {
               <span class="flex items-center gap-1 font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
                 <i class="ph-bold ph-clock"></i> ${exam.durationMinutes} phút
               </span>
-              <span><i class="ph ph-list-numbers"></i> ${exam.questions.length} câu</span>
+              <span><i class="ph ph-list-numbers"></i> ${exam.questions ? exam.questions.length : 0} câu</span>
             </div>
           </div>
           
@@ -1593,7 +1676,8 @@ const firebaseConfig = {
     const savedTheme = localStorage.getItem("prep_holiday_theme") || "default";
     applyTheme(savedTheme);
 
-    // BẮT ĐẦU ĐỒNG BỘ ĐỀ THI TỪ CLOUD FIRESTORE
+    // KÍCH HOẠT HIỂN THỊ VÀ ĐỒNG BỘ
+    renderExamList();
     syncExamsFromCloud();
   </script>
 </body>
