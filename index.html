@@ -40,7 +40,7 @@
 </head>
 <body id="app-body" class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans relative">
 
-  <!-- CANVAS HIỆU ỨNG LỄ HỘI -->
+  <!-- CANVAS LỄ HỘI -->
   <canvas id="holiday-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 40;"></canvas>
 
   <!-- BANNER LỄ HỘI -->
@@ -60,8 +60,8 @@
       </div>
 
       <nav class="flex items-center space-x-2">
-        <button onclick="switchView('home')" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Thư Viện Đề</button>
-        <button id="nav-teacher-btn" onclick="switchView('teacher')" class="hidden px-3 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition items-center gap-1.5 border border-indigo-200">
+        <button onclick="switchView('home')" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Thư Viện Đề</button>
+        <button id="nav-teacher-btn" onclick="switchView('teacher')" class="hidden px-3.5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition items-center gap-1.5 border border-indigo-200">
           <i class="ph-bold ph-chalkboard-teacher text-lg"></i> Quản Lý Bài Nộp
         </button>
 
@@ -83,7 +83,7 @@
           <div class="flex items-center gap-2 border border-slate-200 py-1.5 px-3 rounded-full bg-slate-50">
             <div id="user-avatar-badge" class="w-7 h-7 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center uppercase">U</div>
             <span id="user-name" class="text-xs font-semibold text-slate-700 max-w-[110px] truncate">Người dùng</span>
-            <span id="teacher-badge" class="hidden px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black uppercase">GV</span>
+            <span id="teacher-badge" class="hidden px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black uppercase">GIÁO VIÊN</span>
           </div>
           <button onclick="logout()" title="Đăng xuất" class="text-slate-400 hover:text-rose-600 text-lg transition p-1">
             <i class="ph ph-sign-out"></i>
@@ -101,7 +101,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Thư Viện Đề Thi Trực Tuyến</h1>
-          <p class="text-slate-500 mt-1 text-sm">Học sinh đăng nhập để làm bài. Kết quả được lưu trực tiếp lên cơ sở dữ liệu của Giáo viên.</p>
+          <p class="text-slate-500 mt-1 text-sm">Đề thi và kết quả được đồng bộ tự động trên toàn bộ các thiết bị qua Đám Mây.</p>
         </div>
         
         <button id="add-exam-btn" onclick="openExamModal()" class="hidden px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm items-center gap-2 transition shadow-lg shadow-indigo-600/30 shrink-0">
@@ -236,12 +236,12 @@
       </div>
     </section>
 
-    <!-- 4. VIEW QUẢN LÝ BÀI NỘP CỦA GIÁO VIÊN (ĐỒNG BỘ FIRESTORE + LOCAL) -->
+    <!-- 4. VIEW QUẢN LÝ BÀI NỘP CỦA GIÁO VIÊN -->
     <section id="view-teacher" class="hidden py-8 px-4 max-w-7xl mx-auto w-full">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 class="text-2xl font-black text-slate-800">Quản Lý Bài Nộp Của Học Sinh</h2>
-          <p class="text-slate-500 text-sm">Theo dõi danh sách bài nộp từ tất cả các máy học sinh qua mạng Internet.</p>
+          <p class="text-slate-500 text-sm">Theo dõi bài nộp của học sinh từ tất cả các máy tính, điện thoại qua mạng Internet.</p>
         </div>
         <div class="flex items-center gap-2">
           <button onclick="exportToCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm">
@@ -308,7 +308,7 @@
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">Địa chỉ Email *</label>
             <input type="email" id="direct-login-email" required placeholder="VD: yourname@gmail.com" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-brand-500">
-            <span class="text-[11px] text-slate-400 mt-1 block">💡 Nếu điền đúng email Giáo viên, hệ thống sẽ tự động bật quyền Quản lý đề.</span>
+            <span class="text-[11px] text-slate-400 mt-1 block">💡 Điền đúng Email Giáo viên để mở quyền tạo/sửa đề.</span>
           </div>
           <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition shadow-sm">
             Vào Làm Bài Ngay
@@ -353,14 +353,14 @@
       </div>
     </div>
 
-    <!-- MODAL TẠO & CHỈNH SỬA ĐỀ THI -->
+    <!-- MODAL TẠO & SỬA ĐỀ THI -->
     <div id="exam-builder-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
           <div>
             <h3 id="builder-modal-title" class="font-bold text-slate-800 text-lg">➕ Thêm Đề Thi Mới</h3>
-            <p class="text-xs text-slate-500">Khu vực dành riêng cho Giáo viên tạo và chỉnh sửa đề.</p>
+            <p class="text-xs text-slate-500">Đề thi sẽ được lưu trực tiếp lên Đám Mây và đồng bộ sang tất cả các thiết bị khác.</p>
           </div>
           <button onclick="closeExamModal()" class="text-slate-400 hover:text-slate-600 p-1 text-xl">
             <i class="ph ph-x"></i>
@@ -423,7 +423,7 @@
         <div class="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-end gap-3 shrink-0">
           <button onclick="closeExamModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition">Hủy bỏ</button>
           <button onclick="saveExamFromBuilder()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm">
-            <i class="ph-bold ph-check"></i> Lưu & Xuất Bản Đề Thi
+            <i class="ph-bold ph-check"></i> Lưu & Đồng Bộ Lên Đám Mây
           </button>
         </div>
 
@@ -554,7 +554,7 @@
     });
 
     /* -------------------------------------------------------------
-       2. CẤU HÌNH FIREBASE & PHÂN QUYỀN GIÁO VIÊN
+       2. CẤU HÌNH FIREBASE & TÀI KHOẢN GIÁO VIÊN
        ------------------------------------------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyBQPADW2JL48w28yJcYVViUXmifs7aRi3Y",
@@ -565,7 +565,8 @@ const firebaseConfig = {
   appId: "1:247432664150:web:20a46d338618746ebbd7f7",
   measurementId: "G-Z660E52LLW"
 };
-    // 👉 ĐIỀN EMAIL GIÁO VIÊN CỦA BẠN VÀO ĐÂY:
+
+    // 👉 EMAIL GIÁO VIÊN CỦA BẠN:
     const TEACHER_EMAILS = [
       "bluzzington1@gmail.",
       "bluzzington1@gmail.com"
@@ -577,13 +578,10 @@ const firebaseConfig = {
     let currentUser = null;
     let isTeacher = false;
 
-    // Tự động khôi phục tài khoản đã đăng nhập
+    // Khôi phục phiên đăng nhập
     const savedUser = localStorage.getItem("prep_logged_user");
     if (savedUser) {
-      try {
-        const u = JSON.parse(savedUser);
-        setUserState(u);
-      } catch(e){}
+      try { setUserState(JSON.parse(savedUser)); } catch(e){}
     }
 
     try {
@@ -595,10 +593,7 @@ const firebaseConfig = {
 
         auth.onAuthStateChanged(user => {
           if (user) {
-            setUserState({
-              displayName: user.displayName || user.email,
-              email: user.email
-            });
+            setUserState({ displayName: user.displayName || user.email, email: user.email });
           }
         });
       }
@@ -606,13 +601,8 @@ const firebaseConfig = {
       console.warn("Chưa cấu hình Firebase hoặc có lỗi:", e);
     }
 
-    function openLoginModal() {
-      document.getElementById('login-modal').classList.remove('hidden');
-    }
-
-    function closeLoginModal() {
-      document.getElementById('login-modal').classList.add('hidden');
-    }
+    function openLoginModal() { document.getElementById('login-modal').classList.remove('hidden'); }
+    function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
 
     function handleDirectLogin(e) {
       e.preventDefault();
@@ -631,13 +621,13 @@ const firebaseConfig = {
 
     function loginWithGoogle() {
       if (!auth) {
-        alert("⚠️ Kết nối Google chưa được cấu hình. Bạn hãy sử dụng form 'Đăng nhập nhanh' bên dưới để vào ngay mà không lo bị lỗi!");
+        alert("⚠️ Kết nối Google chưa cấu hình. Hãy sử dụng form 'Đăng nhập nhanh' bên dưới để vào ngay!");
         return;
       }
       auth.signInWithPopup(googleProvider).then(res => {
         closeLoginModal();
       }).catch(err => {
-        alert("Lỗi kết nối Google: " + err.message + "\n\n👉 Bạn hãy điền Tên & Email ở ô bên dưới để vào làm bài ngay lập tức nhé!");
+        alert("Lỗi kết nối Google: " + err.message + "\n👉 Bạn hãy điền Tên & Email ở mục bên dưới để vào ngay nhé!");
       });
     }
 
@@ -692,7 +682,7 @@ const firebaseConfig = {
     }
 
     /* -------------------------------------------------------------
-       3. DỮ LIỆU ĐỀ THI MẪU
+       3. ĐỒNG BỘ ĐỀ THI ĐA THIẾT BỊ QUA CLOUD FIRESTORE
        ------------------------------------------------------------- */
     let EXAMS_DATABASE = [
       {
@@ -702,17 +692,14 @@ const firebaseConfig = {
         difficulty: "Easy",
         year: "2026",
         durationMinutes: 15,
-        passage: `
-          <h3 class="text-lg font-bold text-slate-900 mb-2">Daily Habits of Healthy People</h3>
-          <p class="mb-3">Drinking at least two liters of water daily helps maintain cellular metabolism. Simple morning exercises, such as a 10-minute walk, significantly boost dopamine levels throughout the day.</p>
-        `,
+        passage: `<h3 class="text-lg font-bold text-slate-900 mb-2">Daily Habits of Healthy People</h3><p>Drinking at least two liters of water daily helps maintain cellular metabolism. Morning exercises boost dopamine levels.</p>`,
         questions: [
           {
             id: 1,
             type: "tf",
             prompt: "Drinking water daily helps maintain cellular metabolism.",
             correctAnswer: "TRUE",
-            explanation: "Dòng đầu nêu rõ: 'Drinking at least two liters of water daily helps maintain cellular metabolism'."
+            explanation: "Thông tin có ở dòng đầu bài đọc."
           },
           {
             id: 2,
@@ -720,59 +707,41 @@ const firebaseConfig = {
             prompt: "Morning exercises can boost [blank] levels in the brain.",
             correctAnswer: "dopamine",
             acceptable: ["dopamine"],
-            explanation: "Đoạn văn nêu: 'significantly boost dopamine levels'."
-          },
-          {
-            id: 3,
-            type: "other",
-            prompt: "Theo bạn, ngoài uống nước thì thói quen buổi sáng nào tốt cho sức khỏe? (Gõ câu trả lời ngắn của bạn):",
-            correctAnswer: "Tập thể dục, đi dạo, ăn sáng đầy đủ",
-            explanation: "Học sinh nêu được một thói quen lành mạnh bất kỳ là đạt điểm."
-          }
-        ]
-      },
-      {
-        id: "ielts-full-reading-demo",
-        title: "IELTS Academic Reading: The Future of Renewable Energy",
-        category: "IELTS",
-        difficulty: "Hard",
-        year: "2026",
-        durationMinutes: 20,
-        passage: `
-          <h3 class="text-lg font-bold text-slate-900 mb-2">Renewable Energy Systems</h3>
-          <p class="mb-3"><strong>Paragraph A:</strong> Photovoltaic solar energy has experienced dramatic cost reductions of over 85%.</p>
-          <p class="mb-3"><strong>Paragraph B:</strong> Offshore wind turbines must withstand violent storm swells in the ocean.</p>
-        `,
-        questions: [
-          {
-            id: 1,
-            type: "matching_heading",
-            prompt: "Chọn tiêu đề phù hợp nhất cho Paragraph A:",
-            headingsList: [
-              "i. The engineering challenges of deep ocean energy",
-              "ii. A steep decline in solar production expenditure"
-            ],
-            correctAnswer: "ii. A steep decline in solar production expenditure",
-            explanation: "Paragraph A nói về chi phí quang điện giảm hơn 85%."
-          },
-          {
-            id: 2,
-            type: "tfng",
-            prompt: "Solar energy is completely free to install for everyone worldwide.",
-            correctAnswer: "NOT GIVEN",
-            explanation: "Bài đọc không hề nói về việc lắp đặt miễn phí trên toàn thế giới."
+            explanation: "Đoạn văn nêu: 'boost dopamine levels'."
           }
         ]
       }
     ];
 
-    const savedExams = localStorage.getItem("prep_custom_exams_v7");
-    if (savedExams) {
-      try { EXAMS_DATABASE = JSON.parse(savedExams); } catch(e){}
+    // 👉 HÀM ĐỒNG BỘ ĐỀ THI TỪ ĐÁM MÂY VỀ MỌI THIẾT BỊ (REALTIME)
+    function syncExamsFromCloud() {
+      if (db) {
+        db.collection("exams").onSnapshot(snapshot => {
+          if (!snapshot.empty) {
+            const cloudExams = [];
+            snapshot.forEach(doc => {
+              cloudExams.push({ id: doc.id, ...doc.data() });
+            });
+            EXAMS_DATABASE = cloudExams;
+            renderExamList();
+          } else {
+            // Nếu trên đám mây chưa có đề nào, tải đề mẫu lên
+            EXAMS_DATABASE.forEach(ex => {
+              db.collection("exams").doc(ex.id).set(ex);
+            });
+            renderExamList();
+          }
+        }, err => {
+          console.error("Lỗi đọc Firestore:", err);
+          renderExamList();
+        });
+      } else {
+        renderExamList();
+      }
     }
 
     /* -------------------------------------------------------------
-       4. BẮT BUỘC ĐĂNG NHẬP ĐỂ LÀM BÀI & CHỐNG GIAN LẬN
+       4. PHÒNG THI & CHỐNG GIAN LẬN
        ------------------------------------------------------------- */
     let tabSwitchViolations = 0;
     const MAX_VIOLATIONS = 3;
@@ -822,7 +791,6 @@ const firebaseConfig = {
       if (!isInExam) return;
       if (document.hidden) {
         tabSwitchViolations++;
-
         const warningBar = document.getElementById("cheat-warning-bar");
         const countText = document.getElementById("violation-count-text");
         if (warningBar && countText) {
@@ -848,9 +816,6 @@ const firebaseConfig = {
       if (modal) modal.classList.add("hidden");
     }
 
-    /* -------------------------------------------------------------
-       5. PHÒNG THI & HIỂN THỊ CÂU HỎI (ĐÃ SỬA LỖI MẤT CHỮ KHI GÕ)
-       ------------------------------------------------------------- */
     let currentExam = null;
     let currentQuestionIdx = 0;
     let userAnswers = {};
@@ -926,11 +891,11 @@ const firebaseConfig = {
           </div>
         `;
       } else if (q.type === 'fill_blank') {
-        // 👉 ĐÃ SỬA: Dùng saveTextAnswer() KHÔNG LÀM MẤT CON TRỎ CHUỘT
+        // Gõ chữ không bao giờ mất tiêu điểm
         const val = userAnswers[q.id] || '';
         inputHtml = `
           <div class="mt-5">
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Gõ từ hoặc cụm từ còn thiếu vào ô bên dưới:</label>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Gõ từ hoặc cụm từ còn thiếu vào ô:</label>
             <input type="text" value="${val}" oninput="saveTextAnswer(${q.id}, this.value)" placeholder="Nhập câu trả lời của bạn..." 
               class="w-full p-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:border-brand-500 focus:bg-white outline-none transition">
           </div>
@@ -951,7 +916,6 @@ const firebaseConfig = {
           </div>
         `;
       } else if (q.type === 'other') {
-        // 👉 ĐÃ SỬA: Dùng saveTextAnswer() cho phần Tự Luận
         const val = userAnswers[q.id] || '';
         inputHtml = `
           <div class="mt-4">
@@ -983,13 +947,11 @@ const firebaseConfig = {
       `;
     }
 
-    // HÀM LƯU ĐÁP ÁN CHO Ô NHẬP VĂN BẢN (KHÔNG VẼ LẠI GIAO DIỆN NÊN GÕ CHỮ MƯỢT MÀ)
     function saveTextAnswer(qId, val) {
       userAnswers[qId] = val;
-      renderQuestionPalette(); // Chỉ đổi màu nút câu hỏi trên thanh danh sách
+      renderQuestionPalette();
     }
 
-    // HÀM LƯU CHO CÁC NÚT BẤM / RADIO
     function saveSelectionAnswer(qId, val) {
       userAnswers[qId] = val;
       renderQuestionPalette();
@@ -1006,7 +968,7 @@ const firebaseConfig = {
     function confirmSubmitExam() { if (confirm('Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?')) submitExam(false); }
 
     /* -------------------------------------------------------------
-       6. CHẤM BÀI & ĐỒNG BỘ ĐÁM MÂY VỀ CHO GIÁO VIÊN
+       5. CHẤM BÀI & TRUYỀN DỮ LIỆU ĐẾN MÁY GIÁO VIÊN
        ------------------------------------------------------------- */
     function submitExam(forcedByCheating = false) {
       clearInterval(timerInterval);
@@ -1082,7 +1044,6 @@ const firebaseConfig = {
       if (forcedByCheating) violationBadge.classList.remove('hidden');
       else violationBadge.classList.add('hidden');
 
-      // GÓI DỮ LIỆU BÀI NỘP
       const submissionData = {
         studentName: currentUser ? currentUser.displayName : "Ẩn danh",
         studentEmail: currentUser ? currentUser.email : "none@email.com",
@@ -1096,28 +1057,20 @@ const firebaseConfig = {
         dateFormatted: new Date().toLocaleTimeString() + " - " + new Date().toLocaleDateString()
       };
 
-      // 1. Lưu vào máy hiện tại
-      const localSubs = JSON.parse(localStorage.getItem("prep_local_submissions") || "[]");
-      localSubs.unshift(submissionData);
-      localStorage.setItem("prep_local_submissions", JSON.stringify(localSubs));
-
-      // 2. 👉 ĐẨY TRỰC TIẾP LÊN ĐÁM MÂY FIRESTORE ĐỂ MÁY GIÁO VIÊN NHẬN ĐƯỢC
+      // Đẩy lên Firestore để các máy khác (máy giáo viên) nhận được
       if (db) {
         db.collection("submissions").add({
           ...submissionData,
           submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          console.log("Đã truyền kết quả bài thi qua Internet tới Giáo viên!");
-        }).catch(err => {
-          console.error("Lỗi Firestore:", err);
-        });
+        }).then(() => console.log("Đã gửi kết quả bài thi tới Giáo viên qua mạng Internet!"))
+          .catch(e => console.error("Lỗi Firestore:", e));
       }
 
       switchView('result');
     }
 
     /* -------------------------------------------------------------
-       7. TẠO & SỬA ĐỀ THI (CHỈ DÀNH CHO GIÁO VIÊN)
+       6. TẠO & XÓA ĐỀ THI LƯU TRỰC TIẾP LÊN ĐÁM MÂY (FIRESTORE)
        ------------------------------------------------------------- */
     let builderQuestions = [];
 
@@ -1134,7 +1087,7 @@ const firebaseConfig = {
       if (examId) {
         const exam = EXAMS_DATABASE.find(e => e.id === examId);
         if (!exam) return;
-        document.getElementById('builder-modal-title').innerText = "✏️ Chỉnh Sửa Đề Thi";
+        document.getElementById('builder-modal-title').innerText = "✏️ Chỉnh Sửa Đề Thi (Lưu Lên Đám Mây)";
         document.getElementById('builder-exam-id').value = exam.id;
         document.getElementById('builder-exam-title').value = exam.title;
         document.getElementById('builder-exam-category').value = exam.category;
@@ -1148,7 +1101,7 @@ const firebaseConfig = {
           addQuestionToBuilder();
         }
       } else {
-        document.getElementById('builder-modal-title').innerText = "➕ Thêm Đề Thi Mới";
+        document.getElementById('builder-modal-title').innerText = "➕ Thêm Đề Thi Mới (Lưu Lên Đám Mây)";
         document.getElementById('builder-exam-id').value = "";
         document.getElementById('builder-exam-title').value = "";
         document.getElementById('builder-exam-duration').value = "45";
@@ -1220,7 +1173,7 @@ const firebaseConfig = {
         const headingsText = (q.headingsList || ["i. Tiêu đề 1", "ii. Tiêu đề 2"]).join('\n');
         return `
           <div class="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
-            <label class="block text-xs font-bold text-slate-700">Danh sách các Headings (Mỗi dòng một Heading số La Mã):</label>
+            <label class="block text-xs font-bold text-slate-700">Danh sách Headings:</label>
             <textarea id="q-headings-list-${idx}" rows="3" class="w-full p-2 text-xs bg-slate-50 border border-slate-200 rounded outline-none">${headingsText}</textarea>
             <label class="block text-xs font-bold text-emerald-700">Đáp án đúng cho câu này:</label>
             <input type="text" id="q-correct-heading-${idx}" value="${q.correctAnswer || ''}" placeholder="VD: ii. Tiêu đề 2" class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-emerald-800 outline-none">
@@ -1231,7 +1184,6 @@ const firebaseConfig = {
           <div class="p-3 bg-white rounded-lg border border-slate-200">
             <label class="block text-xs font-bold text-slate-700 mb-1">Đáp án đúng cần điền:</label>
             <input type="text" id="q-fill-${idx}" value="${q.correctAnswer || ''}" placeholder="VD: dopamine (hoặc điền nhiều đáp án cách nhau bằng dấu phẩy: dopamine, endorphin)" class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-700 outline-none">
-            <span class="text-[11px] text-slate-400 mt-1 block">💡 Có thể điền nhiều từ đúng cách nhau bằng dấu phẩy. Hệ thống tự động nhận diện chữ hoa và chữ thường.</span>
           </div>
         `;
       } else if (q.type === 'other') {
@@ -1285,6 +1237,7 @@ const firebaseConfig = {
       builderQuestions[idx]._deleted = true;
     }
 
+    // 👉 HÀM LƯU ĐỀ THI LÊN ĐÁM MÂY FIRESTORE ĐỂ TẤT CẢ CÁC MÁY KHÁC ĐỀU THẤY
     function saveExamFromBuilder() {
       if (!isTeacher) {
         alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên!");
@@ -1323,7 +1276,6 @@ const firebaseConfig = {
           });
         } else if (q.type === 'fill_blank') {
           const ans = document.getElementById(`q-fill-${idx}`).value.trim();
-          // Hỗ trợ nhiều đáp án cách nhau bằng dấu phẩy
           const acceptable = ans.split(',').map(s => s.trim()).filter(s => s.length > 0);
           questions.push({
             id: questions.length + 1,
@@ -1391,7 +1343,6 @@ const firebaseConfig = {
       }
 
       const examData = {
-        id: examId,
         title: title,
         category: category,
         difficulty: level,
@@ -1401,32 +1352,40 @@ const firebaseConfig = {
         questions: questions
       };
 
-      const existIdx = EXAMS_DATABASE.findIndex(e => e.id === examId);
-      if (existIdx >= 0) EXAMS_DATABASE[existIdx] = examData;
-      else EXAMS_DATABASE.unshift(examData);
-
-      localStorage.setItem("prep_custom_exams_v7", JSON.stringify(EXAMS_DATABASE));
-      alert(`🎉 Đã lưu đề thi thành công!`);
-      closeExamModal();
-      renderExamList();
+      // ĐẨY TRỰC TIẾP LÊN CLOUD FIRESTORE
+      if (db) {
+        db.collection("exams").doc(examId).set(examData).then(() => {
+          alert(`🎉 Đã lưu và đồng bộ đề thi "${title}" lên Đám Mây! Tất cả học sinh và thiết bị khác sẽ thấy ngay.`);
+          closeExamModal();
+        }).catch(err => {
+          alert("Lỗi lưu lên đám mây: " + err.message + "\n👉 Hãy kiểm tra lại tab Rules trong Firestore Database đã mở quyền chưa nhé.");
+        });
+      } else {
+        alert("⚠️ Bạn chưa kết nối Firebase nên chỉ lưu trên máy này. Hãy điền mã Firebase để đồng bộ sang các máy khác.");
+      }
     }
 
+    // 👉 HÀM XÓA ĐỀ THI TRÊN ĐÁM MÂY
     function deleteExam(examId, examTitle) {
       if (!isTeacher) {
-        alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên để xóa đề thi!");
+        alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên!");
         return;
       }
 
-      if (confirm(`Bạn có chắc muốn xóa đề thi "${examTitle}" không?`)) {
-        EXAMS_DATABASE = EXAMS_DATABASE.filter(e => e.id !== examId);
-        localStorage.setItem("prep_custom_exams_v7", JSON.stringify(EXAMS_DATABASE));
-        alert("Đã xóa đề thi!");
-        renderExamList();
+      if (confirm(`Bạn có chắc muốn xóa đề thi "${examTitle}" trên toàn bộ hệ thống các thiết bị không?`)) {
+        if (db) {
+          db.collection("exams").doc(examId).delete().then(() => {
+            alert(`Đã xóa đề thi "${examTitle}" khỏi toàn bộ các thiết bị!`);
+          }).catch(err => alert("Lỗi xóa: " + err.message));
+        } else {
+          EXAMS_DATABASE = EXAMS_DATABASE.filter(e => e.id !== examId);
+          renderExamList();
+        }
       }
     }
 
     /* -------------------------------------------------------------
-       8. HIỂN THỊ ĐỀ THI TRANG CHỦ
+       7. HIỂN THỊ ĐỀ THI TRANG CHỦ
        ------------------------------------------------------------- */
     function renderExamList() {
       const cat = document.getElementById('filter-category') ? document.getElementById('filter-category').value : 'ALL';
@@ -1492,7 +1451,7 @@ const firebaseConfig = {
     }
 
     /* -------------------------------------------------------------
-       9. QUẢN LÝ BÀI NỘP CỦA GIÁO VIÊN (ĐỌC TRỰC TIẾP TỪ FIRESTORE)
+       8. QUẢN LÝ BÀI NỘP CỦA GIÁO VIÊN
        ------------------------------------------------------------- */
     let submissionsCache = [];
 
@@ -1504,15 +1463,13 @@ const firebaseConfig = {
       }
 
       const tbody = document.getElementById('teacher-submissions-tbody');
-      tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Đang tải danh sách bài làm từ đám mây Firebase...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Đang đồng bộ bài làm từ Đám Mây...</td></tr>`;
 
-      // 1. 👉 ĐỌC TỪ CLOUD FIRESTORE QUA INTERNET NẾU ĐÃ KẾT NỐI
       if (db) {
         db.collection("submissions").orderBy("submittedAt", "desc").get().then(snapshot => {
           submissionsCache = [];
           if (snapshot.empty) {
-            // Nếu Firestore rỗng, kiểm tra bộ nhớ máy
-            checkLocalFallback();
+            tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Chưa có bài thi nào được nộp qua Internet.</td></tr>`;
             return;
           }
           snapshot.forEach(doc => {
@@ -1523,21 +1480,10 @@ const firebaseConfig = {
           renderSubmissionsTable(submissionsCache);
         }).catch(err => {
           console.error("Lỗi Firestore:", err);
-          checkLocalFallback();
+          tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-500 font-bold">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
         });
       } else {
-        // Chưa có Firestore -> Đọc máy hiện tại
-        checkLocalFallback();
-      }
-
-      function checkLocalFallback() {
-        const localSubs = JSON.parse(localStorage.getItem("prep_local_submissions") || "[]");
-        submissionsCache = localSubs;
-        if (submissionsCache.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Chưa có bài thi nào được nộp.</td></tr>`;
-        } else {
-          renderSubmissionsTable(submissionsCache);
-        }
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-500 font-bold">⚠️ Chưa kết nối Firebase nên không thể tải bài nộp từ các thiết bị khác!</td></tr>`;
       }
     }
 
@@ -1646,7 +1592,9 @@ const firebaseConfig = {
 
     const savedTheme = localStorage.getItem("prep_holiday_theme") || "default";
     applyTheme(savedTheme);
-    renderExamList();
+
+    // BẮT ĐẦU ĐỒNG BỘ ĐỀ THI TỪ CLOUD FIRESTORE
+    syncExamsFromCloud();
   </script>
 </body>
 </html>
