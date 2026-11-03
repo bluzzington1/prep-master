@@ -53,10 +53,9 @@
         </div>
       </div>
 
-      <nav class="hidden md:flex items-center space-x-2">
+      <nav class="flex items-center space-x-2">
         <button onclick="switchView('home')" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Thư Viện Đề</button>
-        <!-- Nút dành riêng cho Giáo viên -->
-        <button id="nav-teacher-btn" onclick="switchView('teacher')" class="hidden px-3.5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition items-center gap-1.5 border border-indigo-200">
+        <button onclick="switchView('teacher')" class="px-3.5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition flex items-center gap-1.5 border border-indigo-200">
           <i class="ph-bold ph-chalkboard-teacher text-lg"></i> Quản Lý Bài Nộp
         </button>
       </nav>
@@ -85,14 +84,15 @@
 
     <!-- 1. HOME VIEW -->
     <section id="view-home" class="py-8 px-4 max-w-7xl mx-auto w-full">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Hệ Thống Luyện Thi Trực Tuyến</h1>
-          <p class="text-slate-500 mt-1 text-sm">Học sinh đăng nhập để làm bài. Kết quả được lưu tự động cho Giáo viên.</p>
+          <p class="text-slate-500 mt-1 text-sm">Học sinh làm bài, hệ thống tự động lưu kết quả lên Firebase để Giáo viên theo dõi.</p>
         </div>
-        <!-- NÚT TẠO ĐỀ NHANH CHO GIÁO VIÊN -->
-        <button id="add-exam-btn" onclick="openExamModal()" class="hidden px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm items-center gap-2 transition shadow-md shrink-0">
-          <i class="ph-bold ph-plus-circle text-lg"></i> Thêm Đề Thi Mới
+        
+        <!-- NÚT TẠO ĐỀ MỚI -->
+        <button onclick="openExamModal()" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm flex items-center gap-2 transition shadow-lg shadow-indigo-600/30 shrink-0">
+          <i class="ph-bold ph-plus-circle text-xl"></i> ➕ Tạo Đề Thi Mới
         </button>
       </div>
 
@@ -102,8 +102,8 @@
           <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Kỳ thi</label>
           <select id="filter-category" onchange="renderExamList()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium">
             <option value="ALL">Tất cả kỳ thi</option>
-            <option value="IELTS">IELTS</option>
-            <option value="HSG">Học Sinh Giỏi</option>
+            <option value="IELTS">IELTS Reading / Listening</option>
+            <option value="HSG">Học Sinh Giỏi (C1/C2)</option>
             <option value="SAT">Digital SAT</option>
           </select>
         </div>
@@ -133,7 +133,7 @@
       <div id="exam-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
 
-    <!-- 2. EXAM WORKSPACE -->
+    <!-- 2. EXAM WORKSPACE (GIAO DIỆN LÀM BÀI) -->
     <section id="view-exam" class="hidden flex-1 flex flex-col h-[calc(100vh-64px)] bg-slate-100 overflow-hidden">
       <div class="bg-white border-b border-slate-200 px-6 py-2.5 flex items-center justify-between shrink-0">
         <div class="flex items-center space-x-3">
@@ -141,9 +141,10 @@
           <h2 id="exam-title-header" class="text-sm font-bold text-slate-800 truncate max-w-xs md:max-w-md">Tiêu đề</h2>
         </div>
         <div class="flex items-center space-x-4">
-          <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-lg text-slate-700 font-mono font-bold text-sm">
-            <i class="ph ph-clock text-base text-brand-600"></i>
-            <span id="timer-display">40:00</span>
+          <!-- ĐỒNG HỒ ĐẾM NGƯỢC -->
+          <div class="flex items-center space-x-2 bg-amber-50 border border-amber-200 px-3.5 py-1.5 rounded-lg text-amber-800 font-mono font-bold text-sm">
+            <i class="ph ph-clock text-base text-amber-600"></i>
+            <span id="timer-display">00:00</span>
           </div>
           <button onclick="confirmSubmitExam()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold transition flex items-center gap-1.5 shadow-sm">
             <i class="ph-bold ph-check-circle"></i> Nộp Bài
@@ -152,15 +153,17 @@
       </div>
 
       <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-4 gap-4">
+        <!-- Bài đọc IELTS / Ngữ liệu -->
         <div class="w-full md:w-1/2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
           <div class="p-3.5 border-b border-slate-100 bg-slate-50">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
               <i class="ph ph-article"></i> Bài Đọc / Tài Liệu Đề Thi
             </span>
           </div>
-          <div id="exam-passage-content" class="p-6 overflow-y-auto flex-1 prose prose-slate text-sm max-w-none"></div>
+          <div id="exam-passage-content" class="p-6 overflow-y-auto flex-1 prose prose-slate text-sm max-w-none leading-relaxed"></div>
         </div>
 
+        <!-- Bảng câu hỏi -->
         <div class="w-full md:w-1/2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
           <div class="p-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between overflow-x-auto">
             <div id="question-palette" class="flex items-center space-x-1.5"></div>
@@ -182,14 +185,14 @@
     <section id="view-result" class="hidden py-8 px-4 max-w-4xl mx-auto w-full">
       <div class="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm">
         <div class="text-center pb-6 border-b border-slate-100">
-          <span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-600 font-bold text-xs uppercase tracking-wider rounded-full mb-2">Đã Ghi Nhận Bài Thi</span>
+          <span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-600 font-bold text-xs uppercase tracking-wider rounded-full mb-2">Đã Hoàn Thành</span>
           <h2 id="result-exam-title" class="text-2xl font-black text-slate-800">Kết Quả Bài Làm</h2>
-          <p class="text-slate-500 text-sm mt-1">Bài làm đã được chuyển tự động tới Giáo viên phụ trách.</p>
+          <p class="text-slate-500 text-sm mt-1">Kết quả đã được chấm điểm tự động và gửi về cho Giáo viên.</p>
         </div>
         <div class="grid grid-cols-3 gap-4 my-6">
           <div class="bg-slate-50 p-4 rounded-xl text-center border border-slate-100">
             <div class="text-xs font-bold text-slate-400 uppercase">Điểm quy đổi</div>
-            <div id="result-band" class="text-2xl sm:text-3xl font-black text-brand-600 mt-1">0</div>
+            <div id="result-band" class="text-2xl sm:text-3xl font-black text-brand-600 mt-1">Band 7.0</div>
           </div>
           <div class="bg-slate-50 p-4 rounded-xl text-center border border-slate-100">
             <div class="text-xs font-bold text-slate-400 uppercase">Số câu đúng</div>
@@ -202,7 +205,7 @@
         </div>
         <div class="mt-8">
           <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <i class="ph-bold ph-list-magnifying-glass text-brand-600"></i> Lời Giải Chi Tiết
+            <i class="ph-bold ph-list-magnifying-glass text-brand-600"></i> Lời Giải Chi Tiết Từng Câu
           </h3>
           <div id="result-details-container" class="space-y-4"></div>
         </div>
@@ -212,50 +215,24 @@
       </div>
     </section>
 
-    <!-- 4. TEACHER SUBMISSIONS VIEW -->
+    <!-- 4. VIEW QUẢN LÝ BÀI NỘP CỦA GIÁO VIÊN -->
     <section id="view-teacher" class="hidden py-8 px-4 max-w-7xl mx-auto w-full">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h2 class="text-2xl font-black text-slate-800">Quản Lý Bài Nộp Của Học Sinh</h2>
-          <p class="text-slate-500 text-sm">Theo dõi điểm số, xem chi tiết bài làm, xóa bài hoặc xuất bảng điểm.</p>
+          <p class="text-slate-500 text-sm">Theo dõi danh sách bài nộp từ Firebase, xem chi tiết bài làm hoặc xuất file Excel CSV.</p>
         </div>
         <div class="flex items-center gap-2">
           <button onclick="exportToCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm">
             <i class="ph-bold ph-microsoft-excel-logo text-base"></i> Xuất File Excel (CSV)
           </button>
           <button onclick="loadTeacherSubmissions()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1.5 transition">
-            <i class="ph ph-arrow-counter-clockwise"></i> Làm mới
+            <i class="ph ph-arrow-counter-clockwise"></i> Làm mới danh sách
           </button>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="text-xs font-bold text-slate-400 uppercase">Tổng bài nộp</div>
-          <div id="teacher-stat-total" class="text-3xl font-black text-slate-800 mt-1">0</div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="text-xs font-bold text-slate-400 uppercase">Tỷ lệ đúng trung bình</div>
-          <div id="teacher-stat-avg" class="text-3xl font-black text-brand-600 mt-1">0%</div>
-        </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-          <div class="text-xs font-bold text-slate-400 uppercase">Học sinh làm nhiều nhất</div>
-          <div id="teacher-stat-top-student" class="text-base font-bold text-indigo-600 mt-2 truncate">Chưa có</div>
-        </div>
-      </div>
-
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-4 flex flex-col sm:flex-row gap-3">
-        <div class="flex-1 relative">
-          <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-base"></i>
-          <input type="text" id="search-student-input" oninput="applyTeacherFilter()" placeholder="Tìm theo tên học sinh hoặc email..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-brand-500 outline-none">
-        </div>
-        <div class="sm:w-64">
-          <select id="filter-exam-select" onchange="applyTeacherFilter()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium outline-none">
-            <option value="ALL">Tất cả đề thi</option>
-          </select>
-        </div>
-      </div>
-
+      <!-- Bảng danh sách bài nộp -->
       <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-sm">
@@ -270,7 +247,7 @@
               </tr>
             </thead>
             <tbody id="teacher-submissions-tbody" class="divide-y divide-slate-100">
-              <tr><td colspan="6" class="p-8 text-center text-slate-400">Đang tải danh sách bài làm...</td></tr>
+              <tr><td colspan="6" class="p-8 text-center text-slate-400">Đang tải danh sách bài làm từ Firebase...</td></tr>
             </tbody>
           </table>
         </div>
@@ -293,14 +270,14 @@
       </div>
     </div>
 
-    <!-- ================= MODAL TẠO & CHỈNH SỬA ĐỀ THI TRỰC TIẾP TRÊN WEB ================= -->
+    <!-- ================= MODAL TẠO & CHỈNH SỬA ĐỀ THI ================= -->
     <div id="exam-builder-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
           <div>
             <h3 id="builder-modal-title" class="font-bold text-slate-800 text-lg">➕ Thêm Đề Thi Mới</h3>
-            <p class="text-xs text-slate-500">Nhập bài đọc và danh sách câu hỏi. Đề thi sẽ được lưu tự động lên hệ thống.</p>
+            <p class="text-xs text-slate-500">Chỉnh sửa thời gian làm bài, dán bài đọc và thêm các dạng câu hỏi khác nhau.</p>
           </div>
           <button onclick="closeExamModal()" class="text-slate-400 hover:text-slate-600 p-1 text-xl">
             <i class="ph ph-x"></i>
@@ -310,53 +287,55 @@
         <div class="p-6 overflow-y-auto flex-1 space-y-5">
           <input type="hidden" id="builder-exam-id">
 
-          <!-- Thông tin cơ bản của đề -->
+          <!-- THỜI GIAN VÀ THÔNG TIN ĐỀ -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tên đề thi *</label>
-              <input type="text" id="builder-exam-title" placeholder="VD: Đề thi Khảo Sát Số 1" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none">
+              <input type="text" id="builder-exam-title" placeholder="VD: IELTS Reading Academic Test 1" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kỳ thi *</label>
               <select id="builder-exam-category" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none">
-                <option value="IELTS">IELTS</option>
-                <option value="HSG">Học Sinh Giỏi</option>
+                <option value="IELTS">IELTS (Reading/Listening)</option>
+                <option value="HSG">Học Sinh Giỏi (C1/C2)</option>
                 <option value="SAT">Digital SAT</option>
               </select>
             </div>
+            
             <div>
-              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Thời gian làm bài (Phút) *</label>
-              <input type="number" id="builder-exam-duration" value="40" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none">
+              <label class="block text-xs font-bold text-indigo-700 uppercase mb-1 flex items-center gap-1">
+                <i class="ph-bold ph-timer"></i> Thời gian làm bài (Phút) *
+              </label>
+              <input type="number" id="builder-exam-duration" value="60" min="1" max="180" class="w-full p-2.5 bg-indigo-50/50 border border-indigo-200 rounded-xl text-sm font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500 outline-none">
             </div>
+
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Độ khó *</label>
               <select id="builder-exam-level" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none">
-                <option value="Medium">Vừa phải</option>
-                <option value="Hard">Nâng cao</option>
+                <option value="Medium">Vừa phải (Medium)</option>
+                <option value="Hard">Nâng cao (Hard)</option>
               </select>
             </div>
           </div>
 
-          <!-- Đoạn văn / Bài đọc -->
+          <!-- Đoạn văn bài đọc -->
           <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nội dung bài đọc / Đề bài *</label>
-            <textarea id="builder-exam-passage" rows="5" placeholder="Dán bài đọc, ngữ cảnh hoặc hướng dẫn làm bài vào đây..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
+            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nội dung bài đọc / Ngữ liệu (Passage) *</label>
+            <textarea id="builder-exam-passage" rows="6" placeholder="Dán bài đọc IELTS, đoạn văn HSG vào đây..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
           </div>
 
-          <!-- Khu vực câu hỏi -->
+          <!-- Danh sách câu hỏi -->
           <div class="pt-4 border-t border-slate-200">
             <div class="flex items-center justify-between mb-3">
               <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                <i class="ph-bold ph-list-numbers text-brand-600"></i> Danh Sách Câu Hỏi
+                <i class="ph-bold ph-list-numbers text-brand-600"></i> Danh Sách Câu Hỏi Trong Đề
               </h4>
-              <button onclick="addQuestionToBuilder()" type="button" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold rounded-lg text-xs flex items-center gap-1 transition border border-brand-200">
-                <i class="ph-bold ph-plus"></i> Thêm câu hỏi
+              <button onclick="addQuestionToBuilder()" type="button" class="px-3.5 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 font-bold rounded-lg text-xs flex items-center gap-1.5 transition border border-brand-200 shadow-sm">
+                <i class="ph-bold ph-plus"></i> Thêm câu hỏi mới
               </button>
             </div>
 
-            <div id="builder-questions-list" class="space-y-4">
-              <!-- Rendered via JS -->
-            </div>
+            <div id="builder-questions-list" class="space-y-4"></div>
           </div>
         </div>
 
@@ -377,7 +356,7 @@
     /* -------------------------------------------------------------
        1. CẤU HÌNH FIREBASE VÀ EMAIL GIÁO VIÊN
        ------------------------------------------------------------- */
-const firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyBQPADW2JL48w28yJcYVViUXmifs7aRi3Y",
   authDomain: "prep-master-bluzzington.firebaseapp.com",
   projectId: "prep-master-bluzzington",
@@ -396,66 +375,7 @@ const firebaseConfig = {
     let currentUser = null;
     let isTeacher = false;
 
-    // Dữ liệu đề thi mặc định ban đầu
-    let EXAMS_DATABASE = [
-      {
-        id: "de-thi-01",
-        title: "Đề Thi Khảo Sát Số 1: Tiếng Anh Tổng Hợp",
-        category: "Khác",
-        difficulty: "Easy",
-        year: "2026",
-        durationMinutes: 5,
-        hasAudio: false,
-        passage: `<h3 class="text-lg font-bold text-slate-900 mb-3">BÀI ĐỌC SỐ 1</h3><p>Dán bài đọc hoặc hướng dẫn làm bài của bạn vào đây.</p>`,
-        questions: [
-          {
-            id: 1,
-            type: "mcq",
-            prompt: "Câu 1: Chọn đáp án đúng?",
-            options: ["A. Phương án 1", "B. Phương án 2", "C. Phương án 3", "D. Phương án 4"],
-            correctAnswer: 0,
-            explanation: "Giải thích câu 1..."
-          },
-          {
-            id: 2,
-            type: "text",
-            prompt: "Câu 2 (Điền từ): Seldom [blank] out late.",
-            correctAnswer: "does he go",
-            acceptable: ["does he go"],
-            explanation: "Đảo ngữ: Seldom + does + S + V."
-          }
-        ]
-      }
-    ];
-
-    // Lấy đề thi từ Firestore (hoặc localStorage) để hiển thị
-    function loadExamsFromStorage() {
-      // 1. Kiểm tra localStorage trước để hiện tức thì
-      const local = localStorage.getItem("custom_exams");
-      if (local) {
-        try { EXAMS_DATABASE = JSON.parse(local); } catch(e){}
-      }
-      renderExamList();
-
-      // 2. Nếu có kết nối Firestore, đồng bộ với đám mây
-      if (db) {
-        db.collection("exams").get().then(snapshot => {
-          if (!snapshot.empty) {
-            const cloudExams = [];
-            snapshot.forEach(doc => {
-              const ex = doc.data();
-              ex.id = doc.id;
-              cloudExams.push(ex);
-            });
-            EXAMS_DATABASE = cloudExams;
-            localStorage.setItem("custom_exams", JSON.stringify(cloudExams));
-            renderExamList();
-          }
-        }).catch(err => console.log("Chưa đọc được đề từ Firestore:", err));
-      }
-    }
-
-    // Khởi tạo an toàn
+    // Khởi tạo an toàn (nếu chưa điền key cũng không làm đứng web)
     try {
       if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("THAY_API_KEY")) {
         firebase.initializeApp(firebaseConfig);
@@ -467,9 +387,7 @@ const firebaseConfig = {
           currentUser = user;
           const loginBtn = document.getElementById('login-btn');
           const userProfile = document.getElementById('user-profile');
-          const teacherBtn = document.getElementById('nav-teacher-btn');
           const teacherBadge = document.getElementById('teacher-badge');
-          const addExamBtn = document.getElementById('add-exam-btn');
 
           if (user) {
             loginBtn.classList.add('hidden');
@@ -479,36 +397,34 @@ const firebaseConfig = {
 
             if (TEACHER_EMAILS.includes(user.email.toLowerCase())) {
               isTeacher = true;
-              teacherBtn.classList.remove('hidden');
               teacherBadge.classList.remove('hidden');
-              addExamBtn.classList.remove('hidden');
-              addExamBtn.classList.add('flex');
             } else {
               isTeacher = false;
-              teacherBtn.classList.add('hidden');
               teacherBadge.classList.add('hidden');
-              addExamBtn.classList.add('hidden');
             }
           } else {
             loginBtn.classList.remove('hidden');
             userProfile.classList.add('hidden');
-            teacherBtn.classList.add('hidden');
-            addExamBtn.classList.add('hidden');
             isTeacher = false;
           }
-          renderExamList(); // Render lại để hiện nút Sửa/Xóa nếu là Giáo viên
         });
       }
     } catch (e) {
-      console.warn("Lỗi Firebase:", e);
+      console.warn("Chưa cấu hình Firebase hoặc có lỗi:", e);
     }
 
     function loginWithGoogle() {
       if (!auth) {
-        alert("⚠️ Bạn chưa điền mã Firebase vào file index.html! Vui lòng mở file và thay apiKey từ Firebase của bạn vào.");
+        alert("⚠️ Bạn chưa điền mã Firebase vào file index.html! Hãy thay apiKey từ Firebase của bạn vào để đăng nhập.");
         return;
       }
-      auth.signInWithPopup(googleProvider).catch(err => alert("Lỗi đăng nhập: " + err.message));
+      auth.signInWithPopup(googleProvider).catch(err => {
+        if (err.code === "auth/unauthorized-domain") {
+          alert("❌ Lỗi Authorized Domain: Bạn cần thêm tên miền github.io vào Firebase Console -> Authentication -> Settings -> Authorized domains.");
+        } else {
+          alert("Lỗi đăng nhập: " + err.message);
+        }
+      });
     }
 
     function logout() {
@@ -516,7 +432,76 @@ const firebaseConfig = {
     }
 
     /* -------------------------------------------------------------
-       2. TẠO & CHỈNH SỬA ĐỀ THI TRỰC TIẾP TRÊN WEB
+       2. DỮ LIỆU ĐỀ THI MẪU (IELTS T/F/NG, ĐIỀN TỪ, TRẮC NGHIỆM)
+       ------------------------------------------------------------- */
+    let EXAMS_DATABASE = [
+      {
+        id: "ielts-demo-full",
+        title: "IELTS Reading Mini Test: The Secrets of Sleep",
+        category: "IELTS",
+        difficulty: "Hard",
+        year: "2026",
+        durationMinutes: 15,
+        passage: `
+          <h3 class="text-lg font-bold text-slate-900 mb-3">The Science of Deep Sleep</h3>
+          <p class="mb-3">Sleep is essential for human cognitive performance and cellular repair. Scientists have identified four distinct stages of sleep, with Rapid Eye Movement (REM) being the period when most vivid dreaming occurs.</p>
+          <p class="mb-3">During deep slow-wave sleep, the brain flushes out metabolic waste products that accumulate throughout waking hours. Chronic sleep deprivation has been definitively linked to increased risks of cardiovascular disease and memory decline.</p>
+          <p class="mb-3">Recent research suggests that maintaining a consistent sleep schedule is even more critical than total sleep duration.</p>
+        `,
+        questions: [
+          {
+            id: 1,
+            type: "tfng",
+            prompt: "Vivid dreaming predominantly takes place during Rapid Eye Movement (REM) sleep.",
+            correctAnswer: "TRUE",
+            explanation: "Đoạn 1 nêu rõ: 'Rapid Eye Movement (REM) being the period when most vivid dreaming occurs'."
+          },
+          {
+            id: 2,
+            type: "tfng",
+            prompt: "Adults need exactly eight hours of sleep to stay healthy.",
+            correctAnswer: "NOT GIVEN",
+            explanation: "Bài đọc không hề đề cập đến con số 8 tiếng mỗi ngày đối với người lớn."
+          },
+          {
+            id: 3,
+            type: "fill_blank",
+            prompt: "During deep sleep, the brain removes [blank] waste products.",
+            correctAnswer: "metabolic",
+            acceptable: ["metabolic"],
+            explanation: "Đoạn 2 ghi: 'the brain flushes out metabolic waste products'."
+          },
+          {
+            id: 4,
+            type: "mcq",
+            prompt: "What does chronic sleep deprivation directly increase the risk of?",
+            options: [
+              "A. Vision problems",
+              "B. Cardiovascular disease and memory decline",
+              "C. Digestive disorders",
+              "D. Extreme weight loss"
+            ],
+            correctAnswer: 1,
+            explanation: "Thông tin ở cuối đoạn 2: 'increased risks of cardiovascular disease and memory decline'."
+          },
+          {
+            id: 5,
+            type: "tf",
+            prompt: "Total sleep duration is considered far more important than sleep consistency.",
+            correctAnswer: "FALSE",
+            explanation: "Đoạn cuối nói ngược lại: 'maintaining a consistent sleep schedule is even more critical than total sleep duration'."
+          }
+        ]
+      }
+    ];
+
+    const savedExams = localStorage.getItem("prep_custom_exams");
+    if (savedExams) {
+      try { EXAMS_DATABASE = JSON.parse(savedExams); } catch(e){}
+    }
+
+    /* -------------------------------------------------------------
+       3. TẠO & CHỈNH SỬA ĐỀ THI TRỰC TIẾP TRÊN WEB
        ------------------------------------------------------------- */
     let builderQuestions = [];
 
@@ -526,14 +511,13 @@ const firebaseConfig = {
       list.innerHTML = '';
 
       if (examId) {
-        // Chế độ chỉnh sửa đề có sẵn
         const exam = EXAMS_DATABASE.find(e => e.id === examId);
         if (!exam) return;
         document.getElementById('builder-modal-title').innerText = "✏️ Chỉnh Sửa Đề Thi";
         document.getElementById('builder-exam-id').value = exam.id;
         document.getElementById('builder-exam-title').value = exam.title;
         document.getElementById('builder-exam-category').value = exam.category;
-        document.getElementById('builder-exam-duration').value = exam.durationMinutes;
+        document.getElementById('builder-exam-duration').value = exam.durationMinutes || 60;
         document.getElementById('builder-exam-level').value = exam.difficulty;
         document.getElementById('builder-exam-passage').value = exam.passage.replace(/<[^>]*>?/gm, '');
 
@@ -543,13 +527,12 @@ const firebaseConfig = {
           addQuestionToBuilder();
         }
       } else {
-        // Chế độ thêm đề mới
         document.getElementById('builder-modal-title').innerText = "➕ Thêm Đề Thi Mới";
         document.getElementById('builder-exam-id').value = "";
         document.getElementById('builder-exam-title').value = "";
-        document.getElementById('builder-exam-duration').value = "40";
+        document.getElementById('builder-exam-duration').value = "45";
         document.getElementById('builder-exam-passage').value = "";
-        addQuestionToBuilder(); // Thêm sẵn 1 câu hỏi mẫu
+        addQuestionToBuilder();
       }
 
       document.getElementById('exam-builder-modal').classList.remove('hidden');
@@ -562,10 +545,10 @@ const firebaseConfig = {
     function addQuestionToBuilder(qData = null) {
       const qIndex = builderQuestions.length;
       const qObj = qData || {
-        type: "mcq",
+        type: "tfng",
         prompt: "",
         options: ["", "", "", ""],
-        correctAnswer: 0,
+        correctAnswer: "TRUE",
         explanation: ""
       };
       builderQuestions.push(qObj);
@@ -579,51 +562,87 @@ const firebaseConfig = {
         <div class="flex items-center justify-between">
           <span class="font-bold text-xs uppercase text-slate-500">Câu hỏi số ${qIndex + 1}</span>
           <div class="flex items-center gap-2">
-            <select onchange="changeQuestionType(${qIndex}, this.value)" class="text-xs bg-white border border-slate-200 rounded p-1 font-semibold">
-              <option value="mcq" ${qObj.type === 'mcq' ? 'selected' : ''}>Trắc nghiệm ABCD</option>
-              <option value="text" ${qObj.type === 'text' ? 'selected' : ''}>Điền từ / Viết câu</option>
+            <select onchange="changeQuestionType(${qIndex}, this.value)" class="text-xs bg-white border border-slate-300 rounded-lg p-1.5 font-bold text-slate-700 outline-none shadow-sm">
+              <option value="tfng" ${qObj.type === 'tfng' ? 'selected' : ''}>📌 IELTS: True / False / Not Given</option>
+              <option value="fill_blank" ${qObj.type === 'fill_blank' ? 'selected' : ''}>✏️ Điền từ còn thiếu vào chỗ trống</option>
+              <option value="mcq" ${qObj.type === 'mcq' ? 'selected' : ''}>🔘 Trắc nghiệm 4 đáp án (A, B, C, D)</option>
+              <option value="tf" ${qObj.type === 'tf' ? 'selected' : ''}>⚖️ Đúng / Sai (True / False)</option>
             </select>
-            <button onclick="removeQuestionFromBuilder(${qIndex})" type="button" class="text-rose-500 hover:text-rose-700 text-sm p-1"><i class="ph-bold ph-trash"></i></button>
+            <button onclick="removeQuestionFromBuilder(${qIndex})" type="button" class="text-rose-500 hover:text-rose-700 text-sm p-1">
+              <i class="ph-bold ph-trash"></i>
+            </button>
           </div>
         </div>
 
         <div>
-          <input type="text" id="q-prompt-${qIndex}" value="${qObj.prompt || ''}" placeholder="Nhập nội dung câu hỏi..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-medium outline-none">
+          <input type="text" id="q-prompt-${qIndex}" value="${qObj.prompt || ''}" placeholder="Nhập nội dung câu hỏi..." class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium outline-none">
         </div>
 
-        <!-- Khung đáp án -->
         <div id="q-options-container-${qIndex}">
           ${renderOptionsHtml(qIndex, qObj)}
         </div>
 
         <div>
-          <input type="text" id="q-explanation-${qIndex}" value="${qObj.explanation || ''}" placeholder="Giải thích chi tiết đáp án (tùy chọn)..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-600 outline-none">
+          <input type="text" id="q-explanation-${qIndex}" value="${qObj.explanation || ''}" placeholder="Giải thích đáp án chi tiết..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-600 outline-none">
         </div>
       `;
       list.appendChild(box);
     }
 
     function renderOptionsHtml(idx, q) {
-      if (q.type === 'mcq') {
-        const opts = q.options && q.options.length === 4 ? q.options : ["", "", "", ""];
-        const correct = q.correctAnswer || 0;
+      if (q.type === 'tfng') {
+        const cur = q.correctAnswer || "TRUE";
         return `
-          <div class="space-y-1.5">
-            <span class="text-[11px] font-bold text-slate-500">Chọn nút tròn tương ứng với đáp án đúng:</span>
-            ${['A', 'B', 'C', 'D'].map((char, i) => `
-              <div class="flex items-center gap-2">
-                <input type="radio" name="correct-radio-${idx}" value="${i}" ${correct === i ? 'checked' : ''} class="w-4 h-4 text-emerald-600">
-                <span class="text-xs font-bold text-slate-500">${char}.</span>
-                <input type="text" id="q-opt-${idx}-${i}" value="${opts[i] || ''}" placeholder="Đáp án ${char}" class="flex-1 p-1.5 bg-white border border-slate-200 rounded text-xs outline-none">
-              </div>
-            `).join('')}
+          <div class="p-3 bg-white rounded-lg border border-slate-200">
+            <span class="text-xs font-bold text-slate-700 block mb-2">Tích chọn đáp án đúng cho bài IELTS:</span>
+            <div class="flex items-center gap-6">
+              <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-emerald-700">
+                <input type="radio" name="correct-tfng-${idx}" value="TRUE" ${cur === 'TRUE' ? 'checked' : ''} class="w-4 h-4 text-emerald-600"> TRUE
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-rose-700">
+                <input type="radio" name="correct-tfng-${idx}" value="FALSE" ${cur === 'FALSE' ? 'checked' : ''} class="w-4 h-4 text-rose-600"> FALSE
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-amber-700">
+                <input type="radio" name="correct-tfng-${idx}" value="NOT GIVEN" ${cur === 'NOT GIVEN' ? 'checked' : ''} class="w-4 h-4 text-amber-600"> NOT GIVEN
+              </label>
+            </div>
+          </div>
+        `;
+      } else if (q.type === 'fill_blank') {
+        return `
+          <div class="p-3 bg-white rounded-lg border border-slate-200">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Đáp án đúng cần điền vào chỗ trống:</label>
+            <input type="text" id="q-fill-${idx}" value="${q.correctAnswer || ''}" placeholder="VD: metabolic" class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-700 outline-none">
+          </div>
+        `;
+      } else if (q.type === 'tf') {
+        const cur = q.correctAnswer || "TRUE";
+        return `
+          <div class="p-3 bg-white rounded-lg border border-slate-200">
+            <span class="text-xs font-bold text-slate-700 block mb-2">Tích chọn đáp án:</span>
+            <div class="flex items-center gap-6">
+              <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-emerald-700">
+                <input type="radio" name="correct-tf-${idx}" value="TRUE" ${cur === 'TRUE' ? 'checked' : ''} class="w-4 h-4 text-emerald-600"> TRUE (Đúng)
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-rose-700">
+                <input type="radio" name="correct-tf-${idx}" value="FALSE" ${cur === 'FALSE' ? 'checked' : ''} class="w-4 h-4 text-rose-600"> FALSE (Sai)
+              </label>
+            </div>
           </div>
         `;
       } else {
+        const opts = q.options && q.options.length === 4 ? q.options : ["", "", "", ""];
+        const correct = typeof q.correctAnswer === 'number' ? q.correctAnswer : 0;
         return `
-          <div>
-            <label class="block text-[11px] font-bold text-slate-500 mb-1">Đáp án chính xác (Học sinh điền đúng từ này sẽ có điểm):</label>
-            <input type="text" id="q-correct-text-${idx}" value="${q.correctAnswer || ''}" placeholder="VD: does he go" class="w-full p-2 bg-white border border-slate-200 rounded text-xs font-bold text-emerald-700 outline-none">
+          <div class="space-y-1.5 p-3 bg-white rounded-lg border border-slate-200">
+            <span class="text-[11px] font-bold text-slate-500 block mb-1">Điền 4 phương án và tích vào đáp án đúng:</span>
+            ${['A', 'B', 'C', 'D'].map((char, i) => `
+              <div class="flex items-center gap-2">
+                <input type="radio" name="correct-mcq-${idx}" value="${i}" ${correct === i ? 'checked' : ''} class="w-4 h-4 text-emerald-600">
+                <span class="text-xs font-bold text-slate-600 w-4">${char}.</span>
+                <input type="text" id="q-opt-${idx}-${i}" value="${opts[i] || ''}" placeholder="Phương án ${char}" class="flex-1 p-1.5 bg-slate-50 border border-slate-200 rounded text-xs outline-none">
+              </div>
+            `).join('')}
           </div>
         `;
       }
@@ -639,12 +658,11 @@ const firebaseConfig = {
       builderQuestions[idx]._deleted = true;
     }
 
-    // Lưu đề thi vào Database
     function saveExamFromBuilder() {
       const examId = document.getElementById('builder-exam-id').value || ("exam-" + Date.now());
       const title = document.getElementById('builder-exam-title').value.trim();
       const category = document.getElementById('builder-exam-category').value;
-      const duration = parseInt(document.getElementById('builder-exam-duration').value) || 40;
+      const duration = parseInt(document.getElementById('builder-exam-duration').value) || 45;
       const level = document.getElementById('builder-exam-level').value;
       const passageText = document.getElementById('builder-exam-passage').value.trim();
 
@@ -653,40 +671,60 @@ const firebaseConfig = {
         return;
       }
 
-      // Thu thập các câu hỏi
       const questions = [];
       builderQuestions.forEach((q, idx) => {
         if (q._deleted) return;
         const prompt = document.getElementById(`q-prompt-${idx}`).value.trim();
         const explanation = document.getElementById(`q-explanation-${idx}`).value.trim();
 
-        if (q.type === 'mcq') {
+        if (q.type === 'tfng') {
+          const radios = document.getElementsByName(`correct-tfng-${idx}`);
+          let ans = "TRUE";
+          for (let r of radios) { if (r.checked) ans = r.value; }
+          questions.push({
+            id: questions.length + 1,
+            type: "tfng",
+            prompt: prompt,
+            correctAnswer: ans,
+            explanation: explanation
+          });
+        } else if (q.type === 'fill_blank') {
+          const ans = document.getElementById(`q-fill-${idx}`).value.trim();
+          questions.push({
+            id: questions.length + 1,
+            type: "fill_blank",
+            prompt: prompt,
+            correctAnswer: ans,
+            acceptable: [ans],
+            explanation: explanation
+          });
+        } else if (q.type === 'tf') {
+          const radios = document.getElementsByName(`correct-tf-${idx}`);
+          let ans = "TRUE";
+          for (let r of radios) { if (r.checked) ans = r.value; }
+          questions.push({
+            id: questions.length + 1,
+            type: "tf",
+            prompt: prompt,
+            correctAnswer: ans,
+            explanation: explanation
+          });
+        } else {
           const options = [
             document.getElementById(`q-opt-${idx}-0`).value.trim(),
             document.getElementById(`q-opt-${idx}-1`).value.trim(),
             document.getElementById(`q-opt-${idx}-2`).value.trim(),
             document.getElementById(`q-opt-${idx}-3`).value.trim()
           ];
-          const radios = document.getElementsByName(`correct-radio-${idx}`);
+          const radios = document.getElementsByName(`correct-mcq-${idx}`);
           let correct = 0;
           for (let r of radios) { if (r.checked) correct = parseInt(r.value); }
-
           questions.push({
             id: questions.length + 1,
             type: "mcq",
             prompt: prompt,
             options: options,
             correctAnswer: correct,
-            explanation: explanation
-          });
-        } else {
-          const correctText = document.getElementById(`q-correct-text-${idx}`).value.trim();
-          questions.push({
-            id: questions.length + 1,
-            type: "text",
-            prompt: prompt,
-            correctAnswer: correctText,
-            acceptable: [correctText],
             explanation: explanation
           });
         }
@@ -704,12 +742,10 @@ const firebaseConfig = {
         difficulty: level,
         year: "2026",
         durationMinutes: duration,
-        hasAudio: false,
         passage: `<h3 class="text-lg font-bold text-slate-900 mb-3">${title}</h3><p class="whitespace-pre-line">${passageText}</p>`,
         questions: questions
       };
 
-      // Cập nhật mảng hiện tại
       const existIdx = EXAMS_DATABASE.findIndex(e => e.id === examId);
       if (existIdx >= 0) {
         EXAMS_DATABASE[existIdx] = examData;
@@ -717,36 +753,75 @@ const firebaseConfig = {
         EXAMS_DATABASE.unshift(examData);
       }
 
-      // Lưu vào localStorage
-      localStorage.setItem("custom_exams", JSON.stringify(EXAMS_DATABASE));
-
-      // Lưu lên Firestore đám mây nếu có kết nối
-      if (db) {
-        db.collection("exams").doc(examId).set(examData).then(() => {
-          console.log("Đã đồng bộ đề thi lên Firestore!");
-        }).catch(err => console.log("Lỗi lưu Firestore:", err));
-      }
-
-      alert("🎉 Đã lưu và xuất bản đề thi thành công!");
+      localStorage.setItem("prep_custom_exams", JSON.stringify(EXAMS_DATABASE));
+      alert(`🎉 Đã lưu đề thi thành công với thời gian làm bài là ${duration} phút!`);
       closeExamModal();
       renderExamList();
     }
 
-    // Xóa đề thi
     function deleteExam(examId, examTitle) {
-      if (confirm(`Bạn có chắc chắn muốn xóa đề thi "${examTitle}" không?`)) {
+      if (confirm(`Bạn có chắc muốn xóa đề thi "${examTitle}" không?`)) {
         EXAMS_DATABASE = EXAMS_DATABASE.filter(e => e.id !== examId);
-        localStorage.setItem("custom_exams", JSON.stringify(EXAMS_DATABASE));
-        if (db) {
-          db.collection("exams").doc(examId).delete();
-        }
+        localStorage.setItem("prep_custom_exams", JSON.stringify(EXAMS_DATABASE));
         alert("Đã xóa đề thi!");
         renderExamList();
       }
     }
 
     /* -------------------------------------------------------------
-       3. ENGINE LÀM BÀI & NỘP BÀI
+       4. HIỂN THỊ ĐỀ THI
+       ------------------------------------------------------------- */
+    function renderExamList() {
+      const cat = document.getElementById('filter-category') ? document.getElementById('filter-category').value : 'ALL';
+      const level = document.getElementById('filter-level') ? document.getElementById('filter-level').value : 'ALL';
+      const year = document.getElementById('filter-year') ? document.getElementById('filter-year').value : 'ALL';
+      const filtered = EXAMS_DATABASE.filter(exam => {
+        return (cat === 'ALL' || exam.category === cat) &&
+               (level === 'ALL' || exam.difficulty === level) &&
+               (year === 'ALL' || exam.year === year);
+      });
+      const container = document.getElementById('exam-cards-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      filtered.forEach(exam => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-md border bg-brand-50 text-brand-600 border-brand-200">${exam.category}</span>
+              <span class="text-xs font-semibold text-slate-400">${exam.year || '2026'} • ${exam.difficulty}</span>
+            </div>
+            <h3 class="text-base font-bold text-slate-800 line-clamp-2">${exam.title}</h3>
+            <div class="mt-4 flex items-center gap-4 text-xs text-slate-500">
+              <span class="flex items-center gap-1 font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                <i class="ph-bold ph-clock"></i> ${exam.durationMinutes} phút
+              </span>
+              <span><i class="ph ph-list-numbers"></i> ${exam.questions.length} câu</span>
+            </div>
+          </div>
+          
+          <div class="mt-5 space-y-2">
+            <button onclick="startExam('${exam.id}')" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+              Bắt đầu làm bài <i class="ph ph-caret-right"></i>
+            </button>
+            <div class="flex items-center gap-2 pt-1">
+              <button onclick="openExamModal('${exam.id}')" class="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1">
+                <i class="ph-bold ph-pencil-simple"></i> Sửa đề
+              </button>
+              <button onclick="deleteExam('${exam.id}', '${exam.title}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1">
+                <i class="ph-bold ph-trash"></i> Xóa
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* -------------------------------------------------------------
+       5. ENGINE LÀM BÀI & ĐẾM GIỜ
        ------------------------------------------------------------- */
     let currentExam = null;
     let currentQuestionIdx = 0;
@@ -756,12 +831,6 @@ const firebaseConfig = {
     let secondsRemaining = 0;
 
     function startExam(examId) {
-      if (auth && !currentUser) {
-        alert("⚠️ Bạn bắt buộc phải đăng nhập Google để làm bài!");
-        loginWithGoogle();
-        return;
-      }
-
       currentExam = EXAMS_DATABASE.find(e => e.id === examId);
       currentQuestionIdx = 0;
       userAnswers = {};
@@ -771,15 +840,16 @@ const firebaseConfig = {
       document.getElementById('exam-badge').innerText = currentExam.category;
       document.getElementById('exam-passage-content').innerHTML = currentExam.passage;
 
-      secondsRemaining = currentExam.durationMinutes * 60;
+      secondsRemaining = (currentExam.durationMinutes || 60) * 60;
       clearInterval(timerInterval);
       updateTimerDisplay();
+      
       timerInterval = setInterval(() => {
         secondsRemaining--;
         updateTimerDisplay();
         if (secondsRemaining <= 0) {
           clearInterval(timerInterval);
-          alert('Hết giờ làm bài!');
+          alert('⏰ ĐÃ HẾT THỜI GIAN LÀM BÀI! Hệ thống sẽ tự động nộp bài.');
           submitExam();
         }
       }, 1000);
@@ -826,10 +896,51 @@ const firebaseConfig = {
       document.getElementById('next-question-btn').disabled = currentQuestionIdx === currentExam.questions.length - 1;
 
       let inputHtml = '';
-      if (q.type === 'mcq') {
+
+      if (q.type === 'tfng') {
+        const selected = userAnswers[q.id];
+        inputHtml = `
+          <div class="mt-5 space-y-3">
+            <span class="text-xs font-bold text-slate-500 uppercase">Chọn phương án:</span>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              ${['TRUE', 'FALSE', 'NOT GIVEN'].map(opt => `
+                <button type="button" onclick="saveAnswer(${q.id}, '${opt}')" 
+                  class="p-4 rounded-xl border text-sm font-bold text-center transition flex items-center justify-center gap-2
+                  ${selected === opt ? 'border-brand-600 bg-brand-50 text-brand-700 ring-2 ring-brand-500 shadow-sm' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'}">
+                  ${opt}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (q.type === 'fill_blank') {
+        const val = userAnswers[q.id] || '';
+        inputHtml = `
+          <div class="mt-5">
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Nhập từ còn thiếu:</label>
+            <input type="text" value="${val}" oninput="saveAnswer(${q.id}, this.value)" placeholder="Gõ câu trả lời vào đây..." 
+              class="w-full p-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:border-brand-500 focus:bg-white outline-none transition">
+          </div>
+        `;
+      } else if (q.type === 'tf') {
+        const selected = userAnswers[q.id];
+        inputHtml = `
+          <div class="mt-5 space-y-3">
+            <div class="grid grid-cols-2 gap-4">
+              ${['TRUE', 'FALSE'].map(opt => `
+                <button type="button" onclick="saveAnswer(${q.id}, '${opt}')" 
+                  class="p-4 rounded-xl border text-sm font-bold text-center transition
+                  ${selected === opt ? 'border-brand-600 bg-brand-50 text-brand-700 ring-2 ring-brand-500' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'}">
+                  ${opt === 'TRUE' ? 'TRUE (Đúng)' : 'FALSE (Sai)'}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else {
         inputHtml = `
           <div class="space-y-2.5 mt-4">
-            ${q.options.map((opt, oIdx) => `
+            ${(q.options || []).map((opt, oIdx) => `
               <label class="flex items-center p-3.5 border rounded-xl cursor-pointer hover:bg-slate-50 transition ${userAnswers[q.id] === oIdx ? 'border-brand-500 bg-brand-50/40 ring-1 ring-brand-500' : 'border-slate-200'}">
                 <input type="radio" name="q-${q.id}" value="${oIdx}" ${userAnswers[q.id] === oIdx ? 'checked' : ''} onchange="saveAnswer(${q.id}, ${oIdx})" class="w-4 h-4 text-brand-600">
                 <span class="ml-3 text-sm font-medium text-slate-700">${opt}</span>
@@ -837,24 +948,18 @@ const firebaseConfig = {
             `).join('')}
           </div>
         `;
-      } else {
-        inputHtml = `
-          <div class="mt-4">
-            <input type="text" value="${userAnswers[q.id] || ''}" oninput="saveAnswer(${q.id}, this.value)" placeholder="Nhập đáp án..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none">
-          </div>
-        `;
       }
 
       container.innerHTML = `
         <div>
-          <span class="text-xs font-bold text-slate-400 uppercase">Câu hỏi số ${currentQuestionIdx + 1}</span>
+          <span class="text-xs font-bold text-brand-600 uppercase tracking-wider">Câu hỏi ${currentQuestionIdx + 1} (${q.type === 'tfng' ? 'IELTS T/F/NG' : q.type === 'fill_blank' ? 'Điền từ' : q.type === 'tf' ? 'Đúng/Sai' : 'Trắc nghiệm'})</span>
           <h4 class="text-base font-bold text-slate-800 mt-1">${q.prompt}</h4>
           ${inputHtml}
         </div>
       `;
     }
 
-    function saveAnswer(qId, val) { userAnswers[qId] = val; renderQuestionPalette(); }
+    function saveAnswer(qId, val) { userAnswers[qId] = val; renderQuestionPalette(); renderCurrentQuestion(); }
     function toggleFlagCurrentQuestion() {
       const qId = currentExam.questions[currentQuestionIdx].id;
       if (flaggedQuestions.has(qId)) flaggedQuestions.delete(qId);
@@ -862,8 +967,11 @@ const firebaseConfig = {
       renderQuestionPalette();
     }
     function navigateQuestion(d) { currentQuestionIdx += d; renderCurrentQuestion(); renderQuestionPalette(); }
-    function confirmSubmitExam() { if (confirm('Bạn có chắc chắn muốn nộp bài?')) submitExam(); }
+    function confirmSubmitExam() { if (confirm('Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?')) submitExam(); }
 
+    /* -------------------------------------------------------------
+       6. CHẤM BÀI & LƯU LÊN FIREBASE ĐỂ GIÁO VIÊN XEM
+       ------------------------------------------------------------- */
     function submitExam() {
       clearInterval(timerInterval);
       let correctCount = 0;
@@ -875,20 +983,27 @@ const firebaseConfig = {
         const userAns = userAnswers[q.id];
         let isCorrect = false;
 
-        if (q.type === 'mcq') {
-          isCorrect = (userAns !== undefined && Number(userAns) === q.correctAnswer);
-        } else if (q.type === 'text') {
+        if (q.type === 'tfng' || q.type === 'tf') {
+          isCorrect = (userAns && userAns.toUpperCase() === q.correctAnswer.toUpperCase());
+        } else if (q.type === 'fill_blank') {
           if (userAns && typeof userAns === 'string') {
-            isCorrect = (q.acceptable || [q.correctAnswer]).some(a => a.toLowerCase() === userAns.trim().toLowerCase());
+            const accepted = q.acceptable || [q.correctAnswer];
+            isCorrect = accepted.some(a => a.toLowerCase().trim() === userAns.toLowerCase().trim());
           }
+        } else {
+          isCorrect = (userAns !== undefined && Number(userAns) === q.correctAnswer);
         }
+
         if (isCorrect) correctCount++;
+
+        let displayUserAns = userAns !== undefined ? (q.type === 'mcq' ? (q.options ? q.options[userAns] : userAns) : userAns) : 'Chưa làm';
+        let displayCorrectAns = q.type === 'mcq' ? (q.options ? q.options[q.correctAnswer] : q.correctAnswer) : q.correctAnswer;
 
         detailedAnswersToSave.push({
           questionId: q.id,
           prompt: q.prompt,
-          userAnswer: userAns !== undefined ? (q.type === 'mcq' ? q.options[userAns] : userAns) : "Không trả lời",
-          correctAnswer: q.type === 'mcq' ? q.options[q.correctAnswer] : q.correctAnswer,
+          userAnswer: displayUserAns,
+          correctAnswer: displayCorrectAns,
           isCorrect: isCorrect,
           explanation: q.explanation
         });
@@ -898,11 +1013,11 @@ const firebaseConfig = {
         card.innerHTML = `
           <div class="flex items-start justify-between">
             <div class="font-bold text-sm text-slate-800">Câu ${idx + 1}: ${q.prompt}</div>
-            <span class="text-xs font-black px-2 py-0.5 rounded ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${isCorrect ? 'Đúng' : 'Sai'}</span>
+            <span class="text-xs font-black px-2 py-0.5 rounded ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${isCorrect ? 'ĐÚNG' : 'SAI'}</span>
           </div>
-          <div class="text-xs text-slate-600 mt-2"><strong>Bạn chọn:</strong> ${userAns !== undefined ? (q.type === 'mcq' ? q.options[userAns] : userAns) : 'Chưa làm'}</div>
-          <div class="text-xs text-emerald-700 mt-1"><strong>Đáp án đúng:</strong> ${q.type === 'mcq' ? q.options[q.correctAnswer] : q.correctAnswer}</div>
-          <div class="text-xs bg-white p-2 rounded-lg border border-slate-200 mt-2 text-slate-700"><strong>Giải thích:</strong> ${q.explanation || 'Không có giải thích.'}</div>
+          <div class="text-xs text-slate-600 mt-2"><strong>Bạn chọn/điền:</strong> <span class="${isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}">${displayUserAns}</span></div>
+          <div class="text-xs text-emerald-700 mt-1"><strong>Đáp án chuẩn:</strong> ${displayCorrectAns}</div>
+          <div class="text-xs bg-white p-2.5 rounded-lg border border-slate-200 mt-2 text-slate-700"><strong>Giải thích:</strong> ${q.explanation || 'Không có giải thích chi tiết.'}</div>
         `;
         detailsContainer.appendChild(card);
       });
@@ -921,6 +1036,7 @@ const firebaseConfig = {
       document.getElementById('result-correct').innerText = `${correctCount}/${currentExam.questions.length}`;
       document.getElementById('result-time').innerText = `${Math.max(1, currentExam.durationMinutes - Math.ceil(secondsRemaining / 60))} phút`;
 
+      // Lưu kết quả lên Firestore
       if (db && currentUser) {
         db.collection("submissions").add({
           studentName: currentUser.displayName || "Ẩn danh",
@@ -932,140 +1048,73 @@ const firebaseConfig = {
           correctCount: correctCount,
           totalQuestions: currentExam.questions.length,
           scoreBadge: scoreBadge,
-          percentage: Math.round((correctCount / currentExam.questions.length) * 100),
           detailedAnswers: detailedAnswersToSave,
           submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        }).then(() => console.log("Đã gửi kết quả bài thi tới Giáo viên!"));
       }
 
       switchView('result');
     }
 
     /* -------------------------------------------------------------
-       4. QUẢN LÝ BÀI NỘP CỦA HỌC SINH (GIÁO VIÊN)
+       7. QUẢN LÝ BÀI NỘP CỦA HỌC SINH (GIÁO VIÊN)
        ------------------------------------------------------------- */
     let submissionsCache = [];
 
     function loadTeacherSubmissions() {
-      if (!isTeacher || !db) return;
+      if (!db) {
+        alert("⚠️ Bạn chưa kết nối Firebase nên chưa tải được bài nộp từ đám mây!");
+        return;
+      }
       const tbody = document.getElementById('teacher-submissions-tbody');
-      tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Đang tải danh sách bài làm...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Đang tải danh sách bài làm từ Firebase...</td></tr>`;
 
       db.collection("submissions").orderBy("submittedAt", "desc").get().then(snapshot => {
         submissionsCache = [];
-        const examSelect = document.getElementById('filter-exam-select');
-        const examOptions = new Set();
+        tbody.innerHTML = '';
+
+        if (snapshot.empty) {
+          tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Chưa có bài thi nào được nộp.</td></tr>`;
+          return;
+        }
 
         snapshot.forEach(doc => {
           const sub = doc.data();
           sub.docId = doc.id;
           submissionsCache.push(sub);
-          if (sub.examTitle) examOptions.add(sub.examTitle);
-        });
 
-        examSelect.innerHTML = `<option value="ALL">Tất cả đề thi</option>`;
-        examOptions.forEach(title => {
-          examSelect.innerHTML += `<option value="${title}">${title}</option>`;
-        });
+          let dateStr = "Vừa xong";
+          if (sub.submittedAt && sub.submittedAt.toDate) {
+            const d = sub.submittedAt.toDate();
+            dateStr = `${d.getHours()}:${d.getMinutes()} - ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+          }
 
-        renderSubmissionsTable(submissionsCache);
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-50 transition";
+          tr.innerHTML = `
+            <td class="p-4 flex items-center gap-3">
+              <img src="${sub.studentPhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}" class="w-8 h-8 rounded-full border border-slate-200">
+              <div>
+                <div class="font-bold text-slate-800">${sub.studentName}</div>
+                <div class="text-xs text-slate-400">${sub.studentEmail}</div>
+              </div>
+            </td>
+            <td class="p-4 font-medium text-slate-700">${sub.examTitle}</td>
+            <td class="p-4 font-bold text-slate-800">${sub.correctCount} / ${sub.totalQuestions}</td>
+            <td class="p-4"><span class="px-2.5 py-1 text-xs font-black rounded-md bg-brand-50 text-brand-600 border border-brand-200">${sub.scoreBadge}</span></td>
+            <td class="p-4 text-xs text-slate-500">${dateStr}</td>
+            <td class="p-4 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="viewStudentDetail('${sub.docId}')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition">Xem bài</button>
+                <button onclick="deleteSubmission('${sub.docId}', '${sub.studentName}')" class="px-2.5 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-bold transition">Xóa</button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
       }).catch(err => {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500">Lỗi: ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500">Lỗi tải dữ liệu: ${err.message}</td></tr>`;
       });
-    }
-
-    function renderSubmissionsTable(data) {
-      const tbody = document.getElementById('teacher-submissions-tbody');
-      tbody.innerHTML = '';
-
-      if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Không tìm thấy bài nộp nào.</td></tr>`;
-        document.getElementById('teacher-stat-total').innerText = 0;
-        document.getElementById('teacher-stat-avg').innerText = "0%";
-        return;
-      }
-
-      let totalPct = 0;
-      const studentCount = {};
-
-      data.forEach(sub => {
-        totalPct += (sub.percentage || 0);
-        studentCount[sub.studentName] = (studentCount[sub.studentName] || 0) + 1;
-
-        let dateStr = "Vừa nộp";
-        if (sub.submittedAt && sub.submittedAt.toDate) {
-          const d = sub.submittedAt.toDate();
-          dateStr = `${d.getHours()}:${d.getMinutes()} - ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-        }
-
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition";
-        tr.innerHTML = `
-          <td class="p-4 flex items-center gap-3">
-            <img src="${sub.studentPhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}" class="w-8 h-8 rounded-full border border-slate-200">
-            <div>
-              <div class="font-bold text-slate-800">${sub.studentName}</div>
-              <div class="text-xs text-slate-400">${sub.studentEmail}</div>
-            </div>
-          </td>
-          <td class="p-4 font-medium text-slate-700">${sub.examTitle}</td>
-          <td class="p-4 font-bold text-slate-800">${sub.correctCount} / ${sub.totalQuestions}</td>
-          <td class="p-4"><span class="px-2.5 py-1 text-xs font-black rounded-md bg-brand-50 text-brand-600 border border-brand-200">${sub.scoreBadge}</span></td>
-          <td class="p-4 text-xs text-slate-500">${dateStr}</td>
-          <td class="p-4 text-center">
-            <div class="flex items-center justify-center gap-2">
-              <button onclick="viewStudentDetail('${sub.docId}')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition">Xem bài</button>
-              <button onclick="deleteSubmission('${sub.docId}', '${sub.studentName}')" class="px-2.5 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-bold transition">Xóa</button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('teacher-stat-total').innerText = data.length;
-      document.getElementById('teacher-stat-avg').innerText = Math.round(totalPct / data.length) + "%";
-      const topStudent = Object.keys(studentCount).reduce((a, b) => studentCount[a] > studentCount[b] ? a : b, "Chưa có");
-      document.getElementById('teacher-stat-top-student').innerText = topStudent;
-    }
-
-    function applyTeacherFilter() {
-      const keyword = document.getElementById('search-student-input').value.toLowerCase().trim();
-      const examTitle = document.getElementById('filter-exam-select').value;
-      const filtered = submissionsCache.filter(sub => {
-        const matchName = sub.studentName.toLowerCase().includes(keyword) || sub.studentEmail.toLowerCase().includes(keyword);
-        const matchExam = (examTitle === "ALL" || sub.examTitle === examTitle);
-        return matchName && matchExam;
-      });
-      renderSubmissionsTable(filtered);
-    }
-
-    function deleteSubmission(docId, studentName) {
-      if (!db) return;
-      if (confirm(`Bạn có chắc muốn xóa bài làm của "${studentName}"?`)) {
-        db.collection("submissions").doc(docId).delete().then(() => {
-          alert("Đã xóa bài làm!");
-          loadTeacherSubmissions();
-        });
-      }
-    }
-
-    function exportToCSV() {
-      if (submissionsCache.length === 0) return alert("Chưa có dữ liệu bài nộp!");
-      let csv = "\uFEFFTên Học Sinh,Email,Đề Thi,Số Câu Đúng,Tổng Số Câu,Điểm Quy Đổi,Thời Gian Nộp\n";
-      submissionsCache.forEach(sub => {
-        let dateStr = "Vừa nộp";
-        if (sub.submittedAt && sub.submittedAt.toDate) {
-          const d = sub.submittedAt.toDate();
-          dateStr = `${d.getHours()}:${d.getMinutes()} ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-        }
-        csv += `"${sub.studentName}","${sub.studentEmail}","${sub.examTitle}",${sub.correctCount},${sub.totalQuestions},"${sub.scoreBadge}","${dateStr}"\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `Bang_Diem_${new Date().toISOString().slice(0, 10)}.csv`;
-      link.click();
     }
 
     function viewStudentDetail(docId) {
@@ -1096,8 +1145,37 @@ const firebaseConfig = {
       document.getElementById('teacher-detail-modal').classList.add('hidden');
     }
 
+    function deleteSubmission(docId, studentName) {
+      if (!db) return;
+      if (confirm(`Bạn có chắc muốn xóa bài làm của "${studentName}"?`)) {
+        db.collection("submissions").doc(docId).delete().then(() => {
+          alert("Đã xóa bài làm!");
+          loadTeacherSubmissions();
+        });
+      }
+    }
+
+    function exportToCSV() {
+      if (submissionsCache.length === 0) return alert("Chưa có dữ liệu bài nộp để xuất Excel!");
+      let csv = "\uFEFFTên Học Sinh,Email,Đề Thi,Số Câu Đúng,Tổng Số Câu,Điểm Quy Đổi,Thời Gian Nộp\n";
+      submissionsCache.forEach(sub => {
+        let dateStr = "Vừa xong";
+        if (sub.submittedAt && sub.submittedAt.toDate) {
+          const d = sub.submittedAt.toDate();
+          dateStr = `${d.getHours()}:${d.getMinutes()} ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+        }
+        csv += `"${sub.studentName}","${sub.studentEmail}","${sub.examTitle}",${sub.correctCount},${sub.totalQuestions},"${sub.scoreBadge}","${dateStr}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Bang_Diem_Hoc_Sinh_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+    }
+
     /* -------------------------------------------------------------
-       5. ĐIỀU HƯỚNG VÀ HIỂN THỊ
+       8. ĐIỀU HƯỚNG VIEW
        ------------------------------------------------------------- */
     function switchView(viewName) {
       document.getElementById('view-home').classList.add('hidden');
@@ -1114,62 +1192,6 @@ const firebaseConfig = {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function renderExamList() {
-      const cat = document.getElementById('filter-category') ? document.getElementById('filter-category').value : 'ALL';
-      const level = document.getElementById('filter-level') ? document.getElementById('filter-level').value : 'ALL';
-      const year = document.getElementById('filter-year') ? document.getElementById('filter-year').value : 'ALL';
-      const filtered = EXAMS_DATABASE.filter(exam => {
-        return (cat === 'ALL' || exam.category === cat) &&
-               (level === 'ALL' || exam.difficulty === level) &&
-               (year === 'ALL' || exam.year === year);
-      });
-      const container = document.getElementById('exam-cards-container');
-      if (!container) return;
-      container.innerHTML = '';
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400">Chưa có đề thi nào. Hãy bấm "Thêm Đề Thi Mới" để tạo đề đầu tiên.</div>`;
-        return;
-      }
-
-      filtered.forEach(exam => {
-        const card = document.createElement('div');
-        card.className = "bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between";
-        card.innerHTML = `
-          <div>
-            <div class="flex items-center justify-between mb-3">
-              <span class="px-2.5 py-1 text-xs font-bold rounded-md border bg-brand-50 text-brand-600 border-brand-200">${exam.category}</span>
-              <span class="text-xs font-semibold text-slate-400">${exam.year || '2026'} • ${exam.difficulty}</span>
-            </div>
-            <h3 class="text-base font-bold text-slate-800 line-clamp-2">${exam.title}</h3>
-            <div class="mt-4 flex items-center gap-4 text-xs text-slate-500">
-              <span><i class="ph ph-clock"></i> ${exam.durationMinutes} phút</span>
-              <span><i class="ph ph-list-numbers"></i> ${exam.questions.length} câu</span>
-            </div>
-          </div>
-          
-          <div class="mt-5 space-y-2">
-            <button onclick="startExam('${exam.id}')" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
-              Bắt đầu làm bài <i class="ph ph-caret-right"></i>
-            </button>
-            
-            <!-- Nút Sửa / Xóa đề (Chỉ hiện khi Giáo viên đăng nhập) -->
-            ${isTeacher ? `
-              <div class="flex items-center gap-2 pt-1">
-                <button onclick="openExamModal('${exam.id}')" class="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1">
-                  <i class="ph-bold ph-pencil-simple"></i> Sửa đề
-                </button>
-                <button onclick="deleteExam('${exam.id}', '${exam.title}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1">
-                  <i class="ph-bold ph-trash"></i> Xóa
-                </button>
-              </div>
-            ` : ''}
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
     function resetFilters() {
       document.getElementById('filter-category').value = 'ALL';
       document.getElementById('filter-level').value = 'ALL';
@@ -1177,8 +1199,7 @@ const firebaseConfig = {
       renderExamList();
     }
 
-    // Khởi động
-    loadExamsFromStorage();
+    renderExamList();
   </script>
 </body>
 </html>
