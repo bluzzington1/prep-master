@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PrepMaster - Luyện Thi IELTS, HSG & SAT</title>
+  <title>PrepMaster - Luyện Thi IELTS, HSG & SAT Đa Dạng Dạng Bài</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -79,18 +79,17 @@
     </div>
   </header>
 
-  <!-- ================= MAIN WRAPPER ================= -->
+  <!-- ================= MAIN CONTENT ================= -->
   <main class="flex-1 flex flex-col">
 
     <!-- 1. HOME VIEW -->
     <section id="view-home" class="py-8 px-4 max-w-7xl mx-auto w-full">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Hệ Thống Luyện Thi Trực Tuyến</h1>
-          <p class="text-slate-500 mt-1 text-sm">Học sinh làm bài, hệ thống tự động lưu kết quả lên Firebase để Giáo viên theo dõi.</p>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Hệ Thống Luyện Đề Chuẩn Quốc Tế</h1>
+          <p class="text-slate-500 mt-1 text-sm">Hỗ trợ đầy đủ: Matching Headings, Nối thông tin, Điền từ, True/False/Not Given, Trắc nghiệm.</p>
         </div>
         
-        <!-- NÚT TẠO ĐỀ MỚI -->
         <button onclick="openExamModal()" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm flex items-center gap-2 transition shadow-lg shadow-indigo-600/30 shrink-0">
           <i class="ph-bold ph-plus-circle text-xl"></i> ➕ Tạo Đề Thi Mới
         </button>
@@ -133,15 +132,16 @@
       <div id="exam-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
 
-    <!-- 2. EXAM WORKSPACE (GIAO DIỆN LÀM BÀI) -->
+    <!-- 2. EXAM WORKSPACE (PHÒNG THI CHIA ĐÔI MÀN HÌNH) -->
     <section id="view-exam" class="hidden flex-1 flex flex-col h-[calc(100vh-64px)] bg-slate-100 overflow-hidden">
+      <!-- Control bar -->
       <div class="bg-white border-b border-slate-200 px-6 py-2.5 flex items-center justify-between shrink-0">
         <div class="flex items-center space-x-3">
           <span id="exam-badge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-brand-50 text-brand-600 border border-brand-200">IELTS</span>
           <h2 id="exam-title-header" class="text-sm font-bold text-slate-800 truncate max-w-xs md:max-w-md">Tiêu đề</h2>
         </div>
         <div class="flex items-center space-x-4">
-          <!-- ĐỒNG HỒ ĐẾM NGƯỢC -->
+          <!-- Đồng hồ đếm ngược -->
           <div class="flex items-center space-x-2 bg-amber-50 border border-amber-200 px-3.5 py-1.5 rounded-lg text-amber-800 font-mono font-bold text-sm">
             <i class="ph ph-clock text-base text-amber-600"></i>
             <span id="timer-display">00:00</span>
@@ -153,17 +153,17 @@
       </div>
 
       <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-4 gap-4">
-        <!-- Bài đọc IELTS / Ngữ liệu -->
+        <!-- Panel Trái: Bài Đọc / Tài Liệu -->
         <div class="w-full md:w-1/2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
-          <div class="p-3.5 border-b border-slate-100 bg-slate-50">
+          <div class="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="ph ph-article"></i> Bài Đọc / Tài Liệu Đề Thi
+              <i class="ph ph-article"></i> Tài Liệu / Bài Đọc Đề Thi
             </span>
           </div>
           <div id="exam-passage-content" class="p-6 overflow-y-auto flex-1 prose prose-slate text-sm max-w-none leading-relaxed"></div>
         </div>
 
-        <!-- Bảng câu hỏi -->
+        <!-- Panel Phải: Câu Hỏi Đa Dạng Dạng Bài -->
         <div class="w-full md:w-1/2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
           <div class="p-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between overflow-x-auto">
             <div id="question-palette" class="flex items-center space-x-1.5"></div>
@@ -192,7 +192,7 @@
         <div class="grid grid-cols-3 gap-4 my-6">
           <div class="bg-slate-50 p-4 rounded-xl text-center border border-slate-100">
             <div class="text-xs font-bold text-slate-400 uppercase">Điểm quy đổi</div>
-            <div id="result-band" class="text-2xl sm:text-3xl font-black text-brand-600 mt-1">Band 7.0</div>
+            <div id="result-band" class="text-2xl sm:text-3xl font-black text-brand-600 mt-1">Band 7.5</div>
           </div>
           <div class="bg-slate-50 p-4 rounded-xl text-center border border-slate-100">
             <div class="text-xs font-bold text-slate-400 uppercase">Số câu đúng</div>
@@ -232,7 +232,6 @@
         </div>
       </div>
 
-      <!-- Bảng danh sách bài nộp -->
       <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-sm">
@@ -270,14 +269,14 @@
       </div>
     </div>
 
-    <!-- ================= MODAL TẠO & CHỈNH SỬA ĐỀ THI ================= -->
+    <!-- ================= MODAL TẠO & CHỈNH SỬA ĐỀ THI ĐA DẠNG ================= -->
     <div id="exam-builder-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
           <div>
             <h3 id="builder-modal-title" class="font-bold text-slate-800 text-lg">➕ Thêm Đề Thi Mới</h3>
-            <p class="text-xs text-slate-500">Chỉnh sửa thời gian làm bài, dán bài đọc và thêm các dạng câu hỏi khác nhau.</p>
+            <p class="text-xs text-slate-500">Hỗ trợ đầy đủ Matching Headings, Nối thông tin, Điền từ, T/F/NG, Trắc nghiệm.</p>
           </div>
           <button onclick="closeExamModal()" class="text-slate-400 hover:text-slate-600 p-1 text-xl">
             <i class="ph ph-x"></i>
@@ -287,7 +286,7 @@
         <div class="p-6 overflow-y-auto flex-1 space-y-5">
           <input type="hidden" id="builder-exam-id">
 
-          <!-- THỜI GIAN VÀ THÔNG TIN ĐỀ -->
+          <!-- THÔNG TIN VÀ THỜI GIAN LÀM BÀI -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tên đề thi *</label>
@@ -321,7 +320,7 @@
           <!-- Đoạn văn bài đọc -->
           <div>
             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nội dung bài đọc / Ngữ liệu (Passage) *</label>
-            <textarea id="builder-exam-passage" rows="6" placeholder="Dán bài đọc IELTS, đoạn văn HSG vào đây..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
+            <textarea id="builder-exam-passage" rows="6" placeholder="Dán bài đọc IELTS, chia các đoạn A, B, C, D vào đây..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
           </div>
 
           <!-- Danh sách câu hỏi -->
@@ -356,7 +355,7 @@
     /* -------------------------------------------------------------
        1. CẤU HÌNH FIREBASE VÀ EMAIL GIÁO VIÊN
        ------------------------------------------------------------- */
-    const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyBQPADW2JL48w28yJcYVViUXmifs7aRi3Y",
   authDomain: "prep-master-bluzzington.firebaseapp.com",
   projectId: "prep-master-bluzzington",
@@ -365,8 +364,9 @@
   appId: "1:247432664150:web:20a46d338618746ebbd7f7",
   measurementId: "G-Z660E52LLW"
 };
+
     const TEACHER_EMAILS = [
-      "bluzzington1@gmail.com"
+      "bluzzington1@gmail."
     ];
 
     let auth = null;
@@ -375,7 +375,6 @@
     let currentUser = null;
     let isTeacher = false;
 
-    // Khởi tạo an toàn (nếu chưa điền key cũng không làm đứng web)
     try {
       if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("THAY_API_KEY")) {
         firebase.initializeApp(firebaseConfig);
@@ -420,7 +419,7 @@
       }
       auth.signInWithPopup(googleProvider).catch(err => {
         if (err.code === "auth/unauthorized-domain") {
-          alert("❌ Lỗi Authorized Domain: Bạn cần thêm tên miền github.io vào Firebase Console -> Authentication -> Settings -> Authorized domains.");
+          alert("❌ Lỗi Authorized Domain: Cần thêm tên miền github.io vào Firebase Console -> Authentication -> Settings -> Authorized domains.");
         } else {
           alert("Lỗi đăng nhập: " + err.message);
         }
@@ -432,76 +431,100 @@
     }
 
     /* -------------------------------------------------------------
-       2. DỮ LIỆU ĐỀ THI MẪU (IELTS T/F/NG, ĐIỀN TỪ, TRẮC NGHIỆM)
+       2. DỮ LIỆU ĐỀ THI MẪU (ĐẦY ĐỦ 6 DẠNG BÀI: HEADINGS, NỐI, ĐIỀN TỪ...)
        ------------------------------------------------------------- */
     let EXAMS_DATABASE = [
       {
-        id: "ielts-demo-full",
-        title: "IELTS Reading Mini Test: The Secrets of Sleep",
+        id: "ielts-full-reading-demo",
+        title: "IELTS Academic Reading: The Future of Renewable Energy",
         category: "IELTS",
         difficulty: "Hard",
         year: "2026",
-        durationMinutes: 15,
+        durationMinutes: 20,
         passage: `
-          <h3 class="text-lg font-bold text-slate-900 mb-3">The Science of Deep Sleep</h3>
-          <p class="mb-3">Sleep is essential for human cognitive performance and cellular repair. Scientists have identified four distinct stages of sleep, with Rapid Eye Movement (REM) being the period when most vivid dreaming occurs.</p>
-          <p class="mb-3">During deep slow-wave sleep, the brain flushes out metabolic waste products that accumulate throughout waking hours. Chronic sleep deprivation has been definitively linked to increased risks of cardiovascular disease and memory decline.</p>
-          <p class="mb-3">Recent research suggests that maintaining a consistent sleep schedule is even more critical than total sleep duration.</p>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">Renewable Energy Systems</h3>
+          <p class="mb-3"><strong>Paragraph A:</strong> Over the past two decades, photovoltaic solar energy has experienced dramatic cost reductions. As manufacturing scales have expanded across Asia and Europe, the cost per kilowatt-hour has dropped by over 85%, making solar the cheapest form of new electricity generation in many regions.</p>
+          <p class="mb-3"><strong>Paragraph B:</strong> In contrast to solar, offshore wind development involves complex maritime engineering. Turbines deployed in the North Sea must withstand violent storm swells and corrosive saltwater. However, oceanic winds remain consistently stronger and more predictable than onshore breezes.</p>
+          <p class="mb-3"><strong>Paragraph C:</strong> Dr. Arthur Vance of the Cambridge Energy Institute pioneered research into high-density lithium-iron batteries. Meanwhile, Professor Helga Schmidt emphasized the importance of continental pumped-storage hydroelectric dams for inter-seasonal storage.</p>
         `,
         questions: [
           {
             id: 1,
-            type: "tfng",
-            prompt: "Vivid dreaming predominantly takes place during Rapid Eye Movement (REM) sleep.",
-            correctAnswer: "TRUE",
-            explanation: "Đoạn 1 nêu rõ: 'Rapid Eye Movement (REM) being the period when most vivid dreaming occurs'."
+            type: "matching_heading", // 1. MATCHING HEADINGS
+            prompt: "Chọn tiêu đề phù hợp nhất cho Paragraph A:",
+            headingsList: [
+              "i. The engineering challenges of deep ocean energy",
+              "ii. A steep decline in solar production expenditure",
+              "iii. The limits of geothermal reservoirs",
+              "iv. Historical reliance on fossil fuels"
+            ],
+            correctAnswer: "ii. A steep decline in solar production expenditure",
+            explanation: "Paragraph A nói về chi phí quang điện giảm hơn 85%: 'cost per kilowatt-hour has dropped by over 85%' tương ứng Heading ii."
           },
           {
             id: 2,
-            type: "tfng",
-            prompt: "Adults need exactly eight hours of sleep to stay healthy.",
-            correctAnswer: "NOT GIVEN",
-            explanation: "Bài đọc không hề đề cập đến con số 8 tiếng mỗi ngày đối với người lớn."
+            type: "matching_heading",
+            prompt: "Chọn tiêu đề phù hợp nhất cho Paragraph B:",
+            headingsList: [
+              "i. The engineering challenges of deep ocean energy",
+              "ii. A steep decline in solar production expenditure",
+              "iii. The limits of geothermal reservoirs",
+              "iv. Historical reliance on fossil fuels"
+            ],
+            correctAnswer: "i. The engineering challenges of deep ocean energy",
+            explanation: "Paragraph B nói về thử thách hàng hải và bão tố trên biển: 'complex maritime engineering... violent storm swells' tương ứng Heading i."
           },
           {
             id: 3,
-            type: "fill_blank",
-            prompt: "During deep sleep, the brain removes [blank] waste products.",
-            correctAnswer: "metabolic",
-            acceptable: ["metabolic"],
-            explanation: "Đoạn 2 ghi: 'the brain flushes out metabolic waste products'."
+            type: "matching_features", // 2. MATCHING FEATURES / NỐI THÔNG TIN
+            prompt: "Nhà nghiên cứu nào nhấn mạnh vai trò của 'continental pumped-storage hydroelectric dams'?",
+            featuresList: [
+              "A. Dr. Arthur Vance",
+              "B. Professor Helga Schmidt",
+              "C. Dr. Dickson Despommier"
+            ],
+            correctAnswer: "B",
+            explanation: "Paragraph C ghi rõ: 'Professor Helga Schmidt emphasized the importance of continental pumped-storage hydroelectric dams'."
           },
           {
             id: 4,
-            type: "mcq",
-            prompt: "What does chronic sleep deprivation directly increase the risk of?",
-            options: [
-              "A. Vision problems",
-              "B. Cardiovascular disease and memory decline",
-              "C. Digestive disorders",
-              "D. Extreme weight loss"
-            ],
-            correctAnswer: 1,
-            explanation: "Thông tin ở cuối đoạn 2: 'increased risks of cardiovascular disease and memory decline'."
+            type: "fill_blank", // 3. ĐIỀN TỪ VÀO CHỖ TRỐNG
+            prompt: "The cost per kilowatt-hour of solar energy has dropped by over [blank] percent.",
+            correctAnswer: "85",
+            acceptable: ["85", "85%"],
+            explanation: "Đoạn A có ghi: 'has dropped by over 85%'."
           },
           {
             id: 5,
-            type: "tf",
-            prompt: "Total sleep duration is considered far more important than sleep consistency.",
+            type: "tfng", // 4. TRUE / FALSE / NOT GIVEN
+            prompt: "Oceanic winds are typically weaker than winds blowing across land masses.",
             correctAnswer: "FALSE",
-            explanation: "Đoạn cuối nói ngược lại: 'maintaining a consistent sleep schedule is even more critical than total sleep duration'."
+            explanation: "Đoạn B khẳng định ngược lại: 'oceanic winds remain consistently stronger and more predictable than onshore breezes'."
+          },
+          {
+            id: 6,
+            type: "mcq", // 5. TRẮC NGHIỆM ABCD
+            prompt: "Where have manufacturing scales predominantly expanded according to paragraph A?",
+            options: [
+              "A. Only North America",
+              "B. Across Asia and Europe",
+              "C. Exclusively in Africa",
+              "D. In South American zones"
+            ],
+            correctAnswer: 1,
+            explanation: "Đoạn A: 'manufacturing scales have expanded across Asia and Europe'."
           }
         ]
       }
     ];
 
-    const savedExams = localStorage.getItem("prep_custom_exams");
+    const savedExams = localStorage.getItem("prep_custom_exams_v2");
     if (savedExams) {
       try { EXAMS_DATABASE = JSON.parse(savedExams); } catch(e){}
     }
 
     /* -------------------------------------------------------------
-       3. TẠO & CHỈNH SỬA ĐỀ THI TRỰC TIẾP TRÊN WEB
+       3. BẢNG TẠO & SỬA ĐỀ VỚI ĐẦY ĐỦ TẤT CẢ DẠNG BÀI
        ------------------------------------------------------------- */
     let builderQuestions = [];
 
@@ -545,10 +568,19 @@
     function addQuestionToBuilder(qData = null) {
       const qIndex = builderQuestions.length;
       const qObj = qData || {
-        type: "tfng",
+        type: "matching_heading",
         prompt: "",
+        headingsList: [
+          "i. Tiêu đề mẫu số 1",
+          "ii. Tiêu đề mẫu số 2",
+          "iii. Tiêu đề mẫu số 3"
+        ],
+        featuresList: [
+          "A. Đối tượng A",
+          "B. Đối tượng B"
+        ],
         options: ["", "", "", ""],
-        correctAnswer: "TRUE",
+        correctAnswer: "",
         explanation: ""
       };
       builderQuestions.push(qObj);
@@ -562,9 +594,12 @@
         <div class="flex items-center justify-between">
           <span class="font-bold text-xs uppercase text-slate-500">Câu hỏi số ${qIndex + 1}</span>
           <div class="flex items-center gap-2">
-            <select onchange="changeQuestionType(${qIndex}, this.value)" class="text-xs bg-white border border-slate-300 rounded-lg p-1.5 font-bold text-slate-700 outline-none shadow-sm">
+            <!-- DANH SÁCH 6 DẠNG BÀI ĐẦY ĐỦ -->
+            <select onchange="changeQuestionType(${qIndex}, this.value)" class="text-xs bg-white border border-slate-300 rounded-lg p-2 font-bold text-slate-700 outline-none shadow-sm">
+              <option value="matching_heading" ${qObj.type === 'matching_heading' ? 'selected' : ''}>📑 IELTS: Matching Headings (Nối tiêu đề)</option>
+              <option value="matching_features" ${qObj.type === 'matching_features' ? 'selected' : ''}>🔗 Matching Features (Nối thông tin/Tác giả)</option>
+              <option value="fill_blank" ${qObj.type === 'fill_blank' ? 'selected' : ''}>✏️ Điền từ vào chỗ trống</option>
               <option value="tfng" ${qObj.type === 'tfng' ? 'selected' : ''}>📌 IELTS: True / False / Not Given</option>
-              <option value="fill_blank" ${qObj.type === 'fill_blank' ? 'selected' : ''}>✏️ Điền từ còn thiếu vào chỗ trống</option>
               <option value="mcq" ${qObj.type === 'mcq' ? 'selected' : ''}>🔘 Trắc nghiệm 4 đáp án (A, B, C, D)</option>
               <option value="tf" ${qObj.type === 'tf' ? 'selected' : ''}>⚖️ Đúng / Sai (True / False)</option>
             </select>
@@ -575,7 +610,8 @@
         </div>
 
         <div>
-          <input type="text" id="q-prompt-${qIndex}" value="${qObj.prompt || ''}" placeholder="Nhập nội dung câu hỏi..." class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium outline-none">
+          <label class="block text-[11px] font-bold text-slate-500 mb-1">Nội dung câu hỏi / Nhận định / Đoạn văn cần nối:</label>
+          <input type="text" id="q-prompt-${qIndex}" value="${qObj.prompt || ''}" placeholder="VD: Chọn tiêu đề cho Paragraph A hoặc Nhập nhận định cần nối..." class="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs font-medium outline-none">
         </div>
 
         <div id="q-options-container-${qIndex}">
@@ -583,18 +619,58 @@
         </div>
 
         <div>
-          <input type="text" id="q-explanation-${qIndex}" value="${qObj.explanation || ''}" placeholder="Giải thích đáp án chi tiết..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-600 outline-none">
+          <input type="text" id="q-explanation-${qIndex}" value="${qObj.explanation || ''}" placeholder="Giải thích chi tiết đáp án (dẫn chứng từ bài đọc)..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-600 outline-none">
         </div>
       `;
       list.appendChild(box);
     }
 
     function renderOptionsHtml(idx, q) {
-      if (q.type === 'tfng') {
+      if (q.type === 'matching_heading') {
+        const headingsText = (q.headingsList || [
+          "i. Tiêu đề mẫu 1",
+          "ii. Tiêu đề mẫu 2",
+          "iii. Tiêu đề mẫu 3"
+        ]).join('\n');
+
+        return `
+          <div class="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
+            <label class="block text-xs font-bold text-slate-700">Danh sách các Headings (Mỗi dòng một Heading số La Mã):</label>
+            <textarea id="q-headings-list-${idx}" rows="4" placeholder="i. Tiêu đề 1&#10;ii. Tiêu đề 2&#10;iii. Tiêu đề 3" class="w-full p-2 text-xs bg-slate-50 border border-slate-200 rounded outline-none">${headingsText}</textarea>
+            
+            <label class="block text-xs font-bold text-emerald-700 pt-1">Đáp án đúng cho câu này (Gõ chính xác dòng Heading đúng):</label>
+            <input type="text" id="q-correct-heading-${idx}" value="${q.correctAnswer || ''}" placeholder="VD: ii. Tiêu đề 2" class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-emerald-800 outline-none">
+          </div>
+        `;
+      } else if (q.type === 'matching_features') {
+        const featuresText = (q.featuresList || [
+          "A. Nhà khoa học A",
+          "B. Nhà khoa học B",
+          "C. Nhà khoa học C"
+        ]).join('\n');
+
+        return `
+          <div class="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
+            <label class="block text-xs font-bold text-slate-700">Danh sách các đối tượng để nối (A, B, C... Mỗi dòng một đối tượng):</label>
+            <textarea id="q-features-list-${idx}" rows="3" placeholder="A. Isaac Newton&#10;B. Albert Einstein&#10;C. Galileo Galilei" class="w-full p-2 text-xs bg-slate-50 border border-slate-200 rounded outline-none">${featuresText}</textarea>
+            
+            <label class="block text-xs font-bold text-emerald-700 pt-1">Chữ cái đáp án đúng (A, B hoặc C...):</label>
+            <input type="text" id="q-correct-feature-${idx}" value="${q.correctAnswer || 'A'}" placeholder="VD: B" class="w-24 p-2 bg-slate-50 border border-slate-200 rounded text-xs font-black text-emerald-800 outline-none uppercase">
+          </div>
+        `;
+      } else if (q.type === 'fill_blank') {
+        return `
+          <div class="p-3 bg-white rounded-lg border border-slate-200">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Đáp án đúng cần điền vào chỗ trống:</label>
+            <input type="text" id="q-fill-${idx}" value="${q.correctAnswer || ''}" placeholder="VD: 85 hoặc metabolic" class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-700 outline-none">
+            <span class="text-[11px] text-slate-400 mt-1 block">Tự động không phân biệt chữ hoa, chữ thường khi học sinh làm bài.</span>
+          </div>
+        `;
+      } else if (q.type === 'tfng') {
         const cur = q.correctAnswer || "TRUE";
         return `
           <div class="p-3 bg-white rounded-lg border border-slate-200">
-            <span class="text-xs font-bold text-slate-700 block mb-2">Tích chọn đáp án đúng cho bài IELTS:</span>
+            <span class="text-xs font-bold text-slate-700 block mb-2">Tích chọn đáp án IELTS:</span>
             <div class="flex items-center gap-6">
               <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-emerald-700">
                 <input type="radio" name="correct-tfng-${idx}" value="TRUE" ${cur === 'TRUE' ? 'checked' : ''} class="w-4 h-4 text-emerald-600"> TRUE
@@ -606,13 +682,6 @@
                 <input type="radio" name="correct-tfng-${idx}" value="NOT GIVEN" ${cur === 'NOT GIVEN' ? 'checked' : ''} class="w-4 h-4 text-amber-600"> NOT GIVEN
               </label>
             </div>
-          </div>
-        `;
-      } else if (q.type === 'fill_blank') {
-        return `
-          <div class="p-3 bg-white rounded-lg border border-slate-200">
-            <label class="block text-xs font-bold text-slate-700 mb-1">Đáp án đúng cần điền vào chỗ trống:</label>
-            <input type="text" id="q-fill-${idx}" value="${q.correctAnswer || ''}" placeholder="VD: metabolic" class="w-full p-2 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-700 outline-none">
           </div>
         `;
       } else if (q.type === 'tf') {
@@ -630,7 +699,7 @@
             </div>
           </div>
         `;
-      } else {
+      } else { // MCQ
         const opts = q.options && q.options.length === 4 ? q.options : ["", "", "", ""];
         const correct = typeof q.correctAnswer === 'number' ? q.correctAnswer : 0;
         return `
@@ -677,15 +746,28 @@
         const prompt = document.getElementById(`q-prompt-${idx}`).value.trim();
         const explanation = document.getElementById(`q-explanation-${idx}`).value.trim();
 
-        if (q.type === 'tfng') {
-          const radios = document.getElementsByName(`correct-tfng-${idx}`);
-          let ans = "TRUE";
-          for (let r of radios) { if (r.checked) ans = r.value; }
+        if (q.type === 'matching_heading') {
+          const listText = document.getElementById(`q-headings-list-${idx}`).value;
+          const headingsList = listText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+          const correct = document.getElementById(`q-correct-heading-${idx}`).value.trim();
           questions.push({
             id: questions.length + 1,
-            type: "tfng",
+            type: "matching_heading",
             prompt: prompt,
-            correctAnswer: ans,
+            headingsList: headingsList,
+            correctAnswer: correct,
+            explanation: explanation
+          });
+        } else if (q.type === 'matching_features') {
+          const listText = document.getElementById(`q-features-list-${idx}`).value;
+          const featuresList = listText.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+          const correct = document.getElementById(`q-correct-feature-${idx}`).value.trim().toUpperCase();
+          questions.push({
+            id: questions.length + 1,
+            type: "matching_features",
+            prompt: prompt,
+            featuresList: featuresList,
+            correctAnswer: correct,
             explanation: explanation
           });
         } else if (q.type === 'fill_blank') {
@@ -696,6 +778,17 @@
             prompt: prompt,
             correctAnswer: ans,
             acceptable: [ans],
+            explanation: explanation
+          });
+        } else if (q.type === 'tfng') {
+          const radios = document.getElementsByName(`correct-tfng-${idx}`);
+          let ans = "TRUE";
+          for (let r of radios) { if (r.checked) ans = r.value; }
+          questions.push({
+            id: questions.length + 1,
+            type: "tfng",
+            prompt: prompt,
+            correctAnswer: ans,
             explanation: explanation
           });
         } else if (q.type === 'tf') {
@@ -709,7 +802,7 @@
             correctAnswer: ans,
             explanation: explanation
           });
-        } else {
+        } else { // MCQ
           const options = [
             document.getElementById(`q-opt-${idx}-0`).value.trim(),
             document.getElementById(`q-opt-${idx}-1`).value.trim(),
@@ -753,7 +846,7 @@
         EXAMS_DATABASE.unshift(examData);
       }
 
-      localStorage.setItem("prep_custom_exams", JSON.stringify(EXAMS_DATABASE));
+      localStorage.setItem("prep_custom_exams_v2", JSON.stringify(EXAMS_DATABASE));
       alert(`🎉 Đã lưu đề thi thành công với thời gian làm bài là ${duration} phút!`);
       closeExamModal();
       renderExamList();
@@ -762,14 +855,14 @@
     function deleteExam(examId, examTitle) {
       if (confirm(`Bạn có chắc muốn xóa đề thi "${examTitle}" không?`)) {
         EXAMS_DATABASE = EXAMS_DATABASE.filter(e => e.id !== examId);
-        localStorage.setItem("prep_custom_exams", JSON.stringify(EXAMS_DATABASE));
+        localStorage.setItem("prep_custom_exams_v2", JSON.stringify(EXAMS_DATABASE));
         alert("Đã xóa đề thi!");
         renderExamList();
       }
     }
 
     /* -------------------------------------------------------------
-       4. HIỂN THỊ ĐỀ THI
+       4. HIỂN THỊ ĐỀ THI TRANG CHỦ
        ------------------------------------------------------------- */
     function renderExamList() {
       const cat = document.getElementById('filter-category') ? document.getElementById('filter-category').value : 'ALL';
@@ -821,7 +914,7 @@
     }
 
     /* -------------------------------------------------------------
-       5. ENGINE LÀM BÀI & ĐẾM GIỜ
+       5. PHÒNG THI & HIỂN THỊ CHI TIẾT TỪNG DẠNG BÀI
        ------------------------------------------------------------- */
     let currentExam = null;
     let currentQuestionIdx = 0;
@@ -849,7 +942,7 @@
         updateTimerDisplay();
         if (secondsRemaining <= 0) {
           clearInterval(timerInterval);
-          alert('⏰ ĐÃ HẾT THỜI GIAN LÀM BÀI! Hệ thống sẽ tự động nộp bài.');
+          alert('⏰ Hết giờ làm bài! Hệ thống tự động nộp bài.');
           submitExam();
         }
       }, 1000);
@@ -887,6 +980,7 @@
       });
     }
 
+    // HIỂN THỊ CÂU HỎI TRONG PHÒNG THI THEO ĐÚNG ĐẶC TRƯNG MỖI DẠNG
     function renderCurrentQuestion() {
       const q = currentExam.questions[currentQuestionIdx];
       const container = document.getElementById('question-container');
@@ -897,7 +991,52 @@
 
       let inputHtml = '';
 
-      if (q.type === 'tfng') {
+      if (q.type === 'matching_heading') {
+        // DẠNG 1: MATCHING HEADINGS
+        const curAns = userAnswers[q.id] || '';
+        inputHtml = `
+          <div class="mt-4 space-y-3">
+            <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed">
+              <span class="font-bold block mb-1">📋 Danh sách Headings khả dụng:</span>
+              ${(q.headingsList || []).map(h => `<div class="py-0.5">• ${h}</div>`).join('')}
+            </div>
+
+            <label class="block text-xs font-bold text-slate-700 mt-3">Chọn Heading phù hợp cho đoạn này:</label>
+            <select onchange="saveAnswer(${q.id}, this.value)" class="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-brand-500">
+              <option value="">-- Bấm để chọn Heading tương ứng --</option>
+              ${(q.headingsList || []).map(h => `
+                <option value="${h}" ${curAns === h ? 'selected' : ''}>${h}</option>
+              `).join('')}
+            </select>
+          </div>
+        `;
+      } else if (q.type === 'matching_features') {
+        // DẠNG 2: MATCHING FEATURES (NỐI THÔNG TIN)
+        const curAns = userAnswers[q.id] || '';
+        inputHtml = `
+          <div class="mt-4 space-y-3">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700">
+              <span class="font-bold block mb-1">🔗 Danh sách các đối tượng để nối:</span>
+              ${(q.featuresList || []).map(f => `<div class="py-0.5 font-medium">${f}</div>`).join('')}
+            </div>
+
+            <label class="block text-xs font-bold text-slate-700">Chọn chữ cái tương ứng với nhận định trên:</label>
+            <div class="flex items-center gap-3">
+              ${(q.featuresList || []).map(f => {
+                const char = f.charAt(0);
+                return `
+                  <button type="button" onclick="saveAnswer(${q.id}, '${char}')"
+                    class="px-5 py-3 rounded-xl border font-black text-sm transition
+                    ${curAns === char ? 'border-brand-600 bg-brand-50 text-brand-700 ring-2 ring-brand-500' : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'}">
+                    ${f}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      } else if (q.type === 'tfng') {
+        // DẠNG 3: TRUE / FALSE / NOT GIVEN
         const selected = userAnswers[q.id];
         inputHtml = `
           <div class="mt-5 space-y-3">
@@ -914,15 +1053,17 @@
           </div>
         `;
       } else if (q.type === 'fill_blank') {
+        // DẠNG 4: ĐIỀN TỪ VÀO CHỖ TRỐNG
         const val = userAnswers[q.id] || '';
         inputHtml = `
           <div class="mt-5">
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Nhập từ còn thiếu:</label>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Nhập từ hoặc cụm từ còn thiếu vào ô:</label>
             <input type="text" value="${val}" oninput="saveAnswer(${q.id}, this.value)" placeholder="Gõ câu trả lời vào đây..." 
               class="w-full p-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:border-brand-500 focus:bg-white outline-none transition">
           </div>
         `;
       } else if (q.type === 'tf') {
+        // DẠNG 5: ĐÚNG / SAI
         const selected = userAnswers[q.id];
         inputHtml = `
           <div class="mt-5 space-y-3">
@@ -938,6 +1079,7 @@
           </div>
         `;
       } else {
+        // DẠNG 6: TRẮC NGHIỆM ABCD
         inputHtml = `
           <div class="space-y-2.5 mt-4">
             ${(q.options || []).map((opt, oIdx) => `
@@ -952,7 +1094,9 @@
 
       container.innerHTML = `
         <div>
-          <span class="text-xs font-bold text-brand-600 uppercase tracking-wider">Câu hỏi ${currentQuestionIdx + 1} (${q.type === 'tfng' ? 'IELTS T/F/NG' : q.type === 'fill_blank' ? 'Điền từ' : q.type === 'tf' ? 'Đúng/Sai' : 'Trắc nghiệm'})</span>
+          <span class="text-xs font-bold text-brand-600 uppercase tracking-wider">
+            Câu ${currentQuestionIdx + 1} • ${q.type === 'matching_heading' ? 'Matching Headings' : q.type === 'matching_features' ? 'Matching Features' : q.type === 'tfng' ? 'IELTS T/F/NG' : q.type === 'fill_blank' ? 'Điền từ' : 'Trắc nghiệm'}
+          </span>
           <h4 class="text-base font-bold text-slate-800 mt-1">${q.prompt}</h4>
           ${inputHtml}
         </div>
@@ -970,7 +1114,7 @@
     function confirmSubmitExam() { if (confirm('Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?')) submitExam(); }
 
     /* -------------------------------------------------------------
-       6. CHẤM BÀI & LƯU LÊN FIREBASE ĐỂ GIÁO VIÊN XEM
+       6. CHẤM BÀI & LƯU LÊN FIREBASE
        ------------------------------------------------------------- */
     function submitExam() {
       clearInterval(timerInterval);
@@ -983,7 +1127,11 @@
         const userAns = userAnswers[q.id];
         let isCorrect = false;
 
-        if (q.type === 'tfng' || q.type === 'tf') {
+        if (q.type === 'matching_heading') {
+          isCorrect = (userAns && userAns.trim() === q.correctAnswer.trim());
+        } else if (q.type === 'matching_features') {
+          isCorrect = (userAns && userAns.toUpperCase() === q.correctAnswer.toUpperCase());
+        } else if (q.type === 'tfng' || q.type === 'tf') {
           isCorrect = (userAns && userAns.toUpperCase() === q.correctAnswer.toUpperCase());
         } else if (q.type === 'fill_blank') {
           if (userAns && typeof userAns === 'string') {
@@ -1017,7 +1165,7 @@
           </div>
           <div class="text-xs text-slate-600 mt-2"><strong>Bạn chọn/điền:</strong> <span class="${isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}">${displayUserAns}</span></div>
           <div class="text-xs text-emerald-700 mt-1"><strong>Đáp án chuẩn:</strong> ${displayCorrectAns}</div>
-          <div class="text-xs bg-white p-2.5 rounded-lg border border-slate-200 mt-2 text-slate-700"><strong>Giải thích:</strong> ${q.explanation || 'Không có giải thích chi tiết.'}</div>
+          <div class="text-xs bg-white p-2.5 rounded-lg border border-slate-200 mt-2 text-slate-700"><strong>Dẫn chứng / Giải thích:</strong> ${q.explanation || 'Không có giải thích chi tiết.'}</div>
         `;
         detailsContainer.appendChild(card);
       });
@@ -1036,7 +1184,6 @@
       document.getElementById('result-correct').innerText = `${correctCount}/${currentExam.questions.length}`;
       document.getElementById('result-time').innerText = `${Math.max(1, currentExam.durationMinutes - Math.ceil(secondsRemaining / 60))} phút`;
 
-      // Lưu kết quả lên Firestore
       if (db && currentUser) {
         db.collection("submissions").add({
           studentName: currentUser.displayName || "Ẩn danh",
@@ -1050,14 +1197,14 @@
           scoreBadge: scoreBadge,
           detailedAnswers: detailedAnswersToSave,
           submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => console.log("Đã gửi kết quả bài thi tới Giáo viên!"));
+        });
       }
 
       switchView('result');
     }
 
     /* -------------------------------------------------------------
-       7. QUẢN LÝ BÀI NỘP CỦA HỌC SINH (GIÁO VIÊN)
+       7. QUẢN LÝ BÀI NỘP CỦA GIÁO VIÊN
        ------------------------------------------------------------- */
     let submissionsCache = [];
 
@@ -1104,10 +1251,7 @@
             <td class="p-4"><span class="px-2.5 py-1 text-xs font-black rounded-md bg-brand-50 text-brand-600 border border-brand-200">${sub.scoreBadge}</span></td>
             <td class="p-4 text-xs text-slate-500">${dateStr}</td>
             <td class="p-4 text-center">
-              <div class="flex items-center justify-center gap-2">
-                <button onclick="viewStudentDetail('${sub.docId}')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition">Xem bài</button>
-                <button onclick="deleteSubmission('${sub.docId}', '${sub.studentName}')" class="px-2.5 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-bold transition">Xóa</button>
-              </div>
+              <button onclick="viewStudentDetail('${sub.docId}')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition">Xem bài</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -1143,16 +1287,6 @@
 
     function closeDetailModal() {
       document.getElementById('teacher-detail-modal').classList.add('hidden');
-    }
-
-    function deleteSubmission(docId, studentName) {
-      if (!db) return;
-      if (confirm(`Bạn có chắc muốn xóa bài làm của "${studentName}"?`)) {
-        db.collection("submissions").doc(docId).delete().then(() => {
-          alert("Đã xóa bài làm!");
-          loadTeacherSubmissions();
-        });
-      }
     }
 
     function exportToCSV() {
