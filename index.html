@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PrepMaster - Hệ Thống Thi & Quản Lý Điểm Học Sinh</title>
+  <title>PrepMaster - Luyện Thi IELTS, HSG & SAT</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -79,7 +79,7 @@
     </div>
   </header>
 
-  <!-- MAIN WRAPPER -->
+  <!-- MAIN -->
   <main class="flex-1 flex flex-col">
 
     <!-- VIEW HOME -->
@@ -89,6 +89,7 @@
         <p class="text-slate-500 mt-2 text-sm">Học sinh đăng nhập Google để làm bài. Kết quả được lưu tự động cho Giáo viên.</p>
       </div>
 
+      <!-- Filters -->
       <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Kỳ thi</label>
@@ -204,7 +205,7 @@
       </div>
     </section>
 
-    <!-- VIEW TEACHER (BẢNG QUẢN LÝ CỦA GIÁO VIÊN) -->
+    <!-- VIEW TEACHER -->
     <section id="view-teacher" class="hidden py-8 px-4 max-w-7xl mx-auto w-full">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
@@ -271,7 +272,7 @@
       </div>
     </section>
 
-    <!-- MODAL XEM CHI TIẾT -->
+    <!-- MODAL CHI TIẾT -->
     <div id="teacher-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -292,18 +293,49 @@
   <!-- ================= JAVASCRIPT SYSTEM ================= -->
   <script>
     /* -------------------------------------------------------------
-       1. CẤU HÌNH FIREBASE VÀ EMAIL GIÁO VIÊN (SỬA Ở ĐÂY)
+       1. CẤU HÌNH ĐỀ THI (LUÔN CHẠY TRƯỚC, KHÔNG PHỤ THUỘC MẠNG)
+       ------------------------------------------------------------- */
+    const EXAMS_DATABASE = [
+      {
+        id: "de-thi-01",
+        title: "Đề Thi Khảo Sát Số 1: Tiếng Anh Tổng Hợp",
+        category: "IELTS",
+        difficulty: "Hard",
+        year: "2026",
+        durationMinutes: 40,
+        hasAudio: false,
+        passage: `
+          <h3 class="text-lg font-bold text-slate-900 mb-3">BÀI ĐỌC SỐ 1</h3>
+          <p class="mb-3">Dán bài đọc hoặc hướng dẫn làm bài của bạn vào đây.</p>
+        `,
+        questions: [
+          {
+            id: 1,
+            type: "mcq",
+            prompt: "Câu 1: Chọn đáp án đúng?",
+            options: ["A. Phương án 1", "B. Phương án 2", "C. Phương án 3", "D. Phương án 4"],
+            correctAnswer: 0,
+            explanation: "Giải thích câu 1..."
+          },
+          {
+            id: 2,
+            type: "text",
+            prompt: "Câu 2 (Điền từ): Seldom [blank] out late.",
+            correctAnswer: "does he go",
+            acceptable: ["does he go"],
+            explanation: "Đảo ngữ: Seldom + does + S + V."
+          }
+        ]
+      }
+    ];
+
+    // Hiển thị đề thi ngay lập tức
+    renderExamList();
+
+    /* -------------------------------------------------------------
+       2. CẤU HÌNH FIREBASE VÀ EMAIL GIÁO VIÊN
        ------------------------------------------------------------- */
     const firebaseConfig = {
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
   apiKey: "AIzaSyBQPADW2JL48w28yJcYVViUXmifs7aRi3Y",
   authDomain: "prep-master-bluzzington.firebaseapp.com",
   projectId: "prep-master-bluzzington",
@@ -311,56 +343,26 @@ const firebaseConfig = {
   messagingSenderId: "247432664150",
   appId: "1:247432664150:web:20a46d338618746ebbd7f7",
   measurementId: "G-Z660E52LLW"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
     };
 
-    // Điền chính xác địa chỉ Gmail của bạn tại đây:
     const TEACHER_EMAILS = [
-      "bluzzington1@gmail.com"
+      "bluzzington1@gmail."
     ];
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
-
+    let auth = null;
+    let db = null;
+    let googleProvider = null;
     let currentUser = null;
     let isTeacher = false;
 
-    auth.onAuthStateChanged(user => {
-      currentUser = user;
-      const loginBtn = document.getElementById('login-btn');
-      const userProfile = document.getElementById('user-profile');
-      const teacherBtn = document.getElementById('nav-teacher-btn');
-      const teacherBadge = document.getElementById('teacher-badge');
+    // Khởi tạo an toàn (nếu lỗi cũng không làm sập trang web)
+    try {
+      if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("THAY_API_KEY")) {
+        firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+        db = firebase.firestore();
+        googleProvider = new firebase.auth.GoogleAuthProvider();
 
-      if (user) {
-        loginBtn.classList.add('hidden');
-        userProfile.classList.remove('hidden');
-        document.getElementById('user-avatar').src = user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user';
-        document.getElementById('user-name').innerText = user.displayName || user.email;
-
-        if (TEACHER_EMAILS.includes(user.email.toLowerCase())) {
-          isTeacher = true;
-          teacherBtn.classList.remove('hidden');
-          teacherBtn.classList.add('flex');
-          teacherBadge.classList.remove('hidden');
-        } else {
-          isTeacher = false;
-          teacherBtn.classList.add('hidden');
-          teacherBadge.classList.add('hidden');
-        }
-      } else {
-        loginBtn.classList.remove('hidden');
-        userProfile.classList.add('hidden');
-        teacherBtn.classList.add('hidden');
-        isTeacher = false;
-      }
-    });
-
-    function loginWithGoogle() {
-      auth.signInWithPopup(googleProvider).catch(err => alert("Lỗi đăng nhập:
+        auth.onAuthStateChanged(user => {
+          currentUser = user;
+          const loginBtn = document.getElementById('login-btn');
