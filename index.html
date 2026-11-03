@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PrepMaster - Luyện Thi IELTS, HSG Tỉnh & Digital SAT</title>
+  <title>PrepMaster - Hệ Thống Thi & Quản Lý Điểm Học Sinh</title>
   
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Phosphor Icons CDN -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
-  <!-- Chart.js CDN (cho biểu đồ thống kê) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <script>
     tailwind.config = {
@@ -31,20 +33,18 @@
   </script>
 
   <style>
-    /* Thanh cuộn mượt cho Split-screen */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
 
-  <!-- ================= TOP NAVIGATION ================= -->
+  <!-- TOP NAVIGATION -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-brand-500/20">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
           <i class="ph-bold ph-graduation-cap"></i>
         </div>
         <div>
@@ -53,735 +53,314 @@
         </div>
       </div>
 
-      <nav class="hidden md:flex items-center space-x-1">
+      <nav class="hidden md:flex items-center space-x-2">
         <button onclick="switchView('home')" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Thư Viện Đề</button>
-        <button onclick="switchView('analytics')" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
-          <i class="ph ph-chart-line-up text-lg text-brand-600"></i> Tiến Độ Cá Nhân
+        <button id="nav-teacher-btn" onclick="switchView('teacher')" class="hidden px-3.5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition items-center gap-1.5 border border-indigo-200">
+          <i class="ph-bold ph-chalkboard-teacher text-lg"></i> Quản Lý Bài Học Sinh
         </button>
       </nav>
 
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2 border border-slate-200 py-1.5 px-3 rounded-full bg-slate-50">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-7 h-7 rounded-full bg-white" alt="Avatar">
-          <span class="text-xs font-semibold text-slate-700">Thí sinh</span>
+      <div id="auth-container" class="flex items-center gap-3">
+        <button onclick="loginWithGoogle()" id="login-btn" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+          <i class="ph-bold ph-google-logo text-base"></i> Đăng nhập Google
+        </button>
+
+        <div id="user-profile" class="hidden flex items-center gap-3">
+          <div class="flex items-center gap-2 border border-slate-200 py-1.5 px-3 rounded-full bg-slate-50">
+            <img id="user-avatar" src="" class="w-7 h-7 rounded-full" alt="Avatar">
+            <span id="user-name" class="text-xs font-semibold text-slate-700 max-w-[120px] truncate">Học sinh</span>
+            <span id="teacher-badge" class="hidden px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black uppercase">GIÁO VIÊN</span>
+          </div>
+          <button onclick="logout()" title="Đăng xuất" class="text-slate-400 hover:text-rose-600 text-lg transition p-1">
+            <i class="ph ph-sign-out"></i>
+          </button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- ================= MAIN CONTENT WRAPPER ================= -->
+  <!-- MAIN WRAPPER -->
   <main class="flex-1 flex flex-col">
 
-    <!-- 1. HOME VIEW (BỘ LỌC VÀ THƯ VIỆN ĐỀ) -->
+    <!-- VIEW HOME -->
     <section id="view-home" class="py-8 px-4 max-w-7xl mx-auto w-full">
-      <div class="text-center max-w-2xl mx-auto mb-10">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Hệ Thống Luyện Đề Thi Trực Tuyến</h1>
-        <p class="text-slate-500 mt-2 text-sm sm:text-base">Mô phỏng tiêu chuẩn phòng thi thật cho IELTS Academic, HSG Tiếng Anh C1/C2 và Digital SAT.</p>
+      <div class="text-center max-w-2xl mx-auto mb-8">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Hệ Thống Đề Thi Trực Tuyến</h1>
+        <p class="text-slate-500 mt-2 text-sm">Học sinh đăng nhập Google để làm bài. Kết quả được lưu tự động cho Giáo viên.</p>
       </div>
 
-      <!-- Filters -->
       <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Kỳ thi</label>
-          <select id="filter-category" onchange="renderExamList()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none">
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Kỳ thi</label>
+          <select id="filter-category" onchange="renderExamList()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium">
             <option value="ALL">Tất cả kỳ thi</option>
-            <option value="IELTS">IELTS Academic (4 Kỹ Năng)</option>
-            <option value="HSG">HSG Tỉnh (C1/C2 Nâng Cao)</option>
-            <option value="SAT">Digital SAT (RW & Math)</option>
+            <option value="IELTS">IELTS</option>
+            <option value="HSG">Học Sinh Giỏi</option>
+            <option value="SAT">Digital SAT</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Độ khó</label>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Độ khó</label>
           <select id="filter-level" onchange="renderExamList()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium">
             <option value="ALL">Tất cả độ khó</option>
-            <option value="Medium">Tiêu chuẩn / Vừa phải</option>
-            <option value="Hard">Nâng cao / Chuyên sâu</option>
+            <option value="Medium">Vừa phải</option>
+            <option value="Hard">Nâng cao</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Năm thi</label>
+          <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Năm</label>
           <select id="filter-year" onchange="renderExamList()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium">
-            <option value="ALL">Tất cả các năm</option>
+            <option value="ALL">Tất cả năm</option>
             <option value="2026">2026</option>
             <option value="2025">2025</option>
-            <option value="2024">2024</option>
           </select>
         </div>
         <div class="flex items-end">
-          <button onclick="resetFilters()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-1.5">
-            <i class="ph ph-arrow-counter-clockwise"></i> Đặt lại bộ lọc
+          <button onclick="resetFilters()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-semibold transition">
+            Đặt lại bộ lọc
           </button>
         </div>
       </div>
 
-      <!-- Exam Cards Grid -->
-      <div id="exam-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Rendered via JS -->
-      </div>
+      <div id="exam-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
 
-    <!-- 2. EXAM VIEW (SPLIT-SCREEN WORKSPACE) -->
+    <!-- VIEW EXAM -->
     <section id="view-exam" class="hidden flex-1 flex flex-col h-[calc(100vh-64px)] bg-slate-100 overflow-hidden">
-      <!-- Control Bar -->
-      <div class="bg-white border-b border-slate-200 px-6 py-2.5 flex items-center justify-between shrink-0 shadow-sm">
+      <div class="bg-white border-b border-slate-200 px-6 py-2.5 flex items-center justify-between shrink-0">
         <div class="flex items-center space-x-3">
-          <span id="exam-badge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md tracking-wider bg-brand-50 text-brand-600 border border-brand-200">IELTS</span>
-          <h2 id="exam-title-header" class="text-sm font-bold text-slate-800 truncate max-w-xs md:max-w-md">Cambridge 18 - Reading Test 1</h2>
+          <span id="exam-badge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-brand-50 text-brand-600 border border-brand-200">IELTS</span>
+          <h2 id="exam-title-header" class="text-sm font-bold text-slate-800 truncate max-w-xs md:max-w-md">Tiêu đề</h2>
         </div>
-
-        <div class="flex items-center space-x-4 md:space-x-6">
-          <!-- Countdown Timer -->
+        <div class="flex items-center space-x-4">
           <div class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3.5 py-1.5 rounded-lg text-slate-700 font-mono font-bold text-sm">
             <i class="ph ph-clock text-base text-brand-600"></i>
-            <span id="timer-display">60:00</span>
+            <span id="timer-display">40:00</span>
           </div>
-
-          <!-- Submit Button -->
-          <button onclick="confirmSubmitExam()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold shadow-md shadow-emerald-600/20 transition flex items-center gap-1.5">
+          <button onclick="confirmSubmitExam()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold transition flex items-center gap-1.5 shadow-sm">
             <i class="ph-bold ph-check-circle"></i> Nộp Bài
           </button>
         </div>
       </div>
 
-      <!-- Split-Screen Area -->
       <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-4 gap-4">
-        
-        <!-- Cột trái: Đoạn văn / Audio -->
         <div class="w-full md:w-1/2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
           <div class="p-3.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
             <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-              <i class="ph ph-article"></i> Đề Bài / Bài Đọc / File Nghe
+              <i class="ph ph-article"></i> Bài Đọc / Tài Liệu
             </span>
-            <div id="listening-audio-player-container" class="hidden">
-              <audio id="exam-audio" controls class="h-8 text-xs">
-                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-                Trình duyệt không hỗ trợ Audio.
-              </audio>
-            </div>
           </div>
-          <div id="exam-passage-content" class="p-6 overflow-y-auto flex-1 prose prose-slate text-sm leading-relaxed max-w-none">
-            <!-- Rendered dynamically -->
-          </div>
+          <div id="exam-passage-content" class="p-6 overflow-y-auto flex-1 prose prose-slate text-sm max-w-none"></div>
         </div>
 
-        <!-- Cột phải: Câu hỏi & Bảng câu hỏi -->
         <div class="w-full md:w-1/2 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col overflow-hidden">
-          <!-- Question Palette -->
           <div class="p-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between overflow-x-auto">
-            <div class="text-xs font-bold text-slate-500 mr-2 shrink-0">Danh sách câu:</div>
-            <div id="question-palette" class="flex items-center space-x-1.5">
-              <!-- Nút câu hỏi -->
-            </div>
+            <div id="question-palette" class="flex items-center space-x-1.5"></div>
             <button id="flag-btn" onclick="toggleFlagCurrentQuestion()" class="ml-3 px-2.5 py-1 text-xs font-medium border border-slate-200 rounded-md hover:bg-slate-100 flex items-center gap-1 text-slate-600 shrink-0">
-              <i class="ph ph-flag"></i> Đánh dấu (Flag)
+              <i class="ph ph-flag"></i> Đánh dấu
             </button>
           </div>
-
-          <!-- Question Content Box -->
-          <div id="question-container" class="p-6 overflow-y-auto flex-1 flex flex-col justify-between">
-            <!-- Question content injected dynamically -->
-          </div>
-
-          <!-- Bottom Navigation -->
+          <div id="question-container" class="p-6 overflow-y-auto flex-1 flex flex-col justify-between"></div>
           <div class="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-            <button id="prev-question-btn" onclick="navigateQuestion(-1)" class="px-4 py-2 text-xs font-bold border border-slate-200 rounded-lg hover:bg-white text-slate-700 transition">
-              &larr; Câu trước
-            </button>
-            <span id="current-question-indicator" class="text-xs font-semibold text-slate-500">Câu 1 / 4</span>
-            <button id="next-question-btn" onclick="navigateQuestion(1)" class="px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg transition">
-              Câu kế tiếp &rarr;
-            </button>
+            <button id="prev-question-btn" onclick="navigateQuestion(-1)" class="px-4 py-2 text-xs font-bold border border-slate-200 rounded-lg hover:bg-white text-slate-700">&larr; Câu trước</button>
+            <span id="current-question-indicator" class="text-xs font-semibold text-slate-500">Câu 1</span>
+            <button id="next-question-btn" onclick="navigateQuestion(1)" class="px-4 py-2 text-xs font-bold bg-brand-600 hover:bg-brand-700 text-white rounded-lg">Câu kế tiếp &rarr;</button>
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- 3. RESULT VIEW (BẢNG KẾT QUẢ & LỜI GIẢI CHI TIẾT) -->
+    <!-- VIEW RESULT -->
     <section id="view-result" class="hidden py-8 px-4 max-w-4xl mx-auto w-full">
       <div class="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-sm">
         <div class="text-center pb-6 border-b border-slate-100">
-          <span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-600 font-bold text-xs uppercase tracking-wider rounded-full mb-2">Đã Hoàn Thành</span>
-          <h2 id="result-exam-title" class="text-2xl font-black text-slate-800">Kết Quả Bài Thi</h2>
-          <p class="text-slate-500 text-sm mt-1">Hệ thống đã tự động chấm điểm và tổng hợp lời giải thích chi tiết.</p>
+          <span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-600 font-bold text-xs uppercase tracking-wider rounded-full mb-2">Đã Ghi Nhận Bài Thi</span>
+          <h2 id="result-exam-title" class="text-2xl font-black text-slate-800">Kết Quả Bài Làm</h2>
+          <p class="text-slate-500 text-sm mt-1">Bài làm đã được chuyển thẳng tới Giáo viên.</p>
         </div>
-
-        <!-- Thống kê kết quả -->
         <div class="grid grid-cols-3 gap-4 my-6">
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+          <div class="bg-slate-50 p-4 rounded-xl text-center border border-slate-100">
             <div class="text-xs font-bold text-slate-400 uppercase">Điểm quy đổi</div>
-            <div id="result-band" class="text-2xl sm:text-3xl font-black text-brand-600 mt-1">Band 7.5</div>
+            <div id="result-band" class="text-2xl sm:text-3xl font-black text-brand-600 mt-1">0</div>
           </div>
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+          <div class="bg-slate-50 p-4 rounded-xl text-center border border-slate-100">
             <div class="text-xs font-bold text-slate-400 uppercase">Số câu đúng</div>
-            <div id="result-correct" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">3/4</div>
+            <div id="result-correct" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">0/0</div>
           </div>
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+          <div class="bg-slate-50 p-4 rounded-xl text-center border border-slate-100">
             <div class="text-xs font-bold text-slate-400 uppercase">Thời gian làm</div>
-            <div id="result-time" class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">12:35</div>
+            <div id="result-time" class="text-2xl sm:text-3xl font-black text-indigo-600 mt-1">0 phút</div>
           </div>
         </div>
-
-        <!-- Danh sách giải thích chi tiết -->
         <div class="mt-8">
           <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <i class="ph-bold ph-list-magnifying-glass text-brand-600"></i> Lời Giải Chi Tiết Từng Câu
+            <i class="ph-bold ph-list-magnifying-glass text-brand-600"></i> Lời Giải Chi Tiết
           </h3>
-          <div id="result-details-container" class="space-y-4">
-            <!-- Rendered via JS -->
-          </div>
+          <div id="result-details-container" class="space-y-4"></div>
         </div>
-
         <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between">
-          <button onclick="switchView('home')" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-bold">
-            Trở về Thư viện
-          </button>
-          <button onclick="switchView('analytics')" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-bold">
-            Xem Tiến Độ Cá Nhân &rarr;
-          </button>
+          <button onclick="switchView('home')" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-bold">Về Thư Viện Đề</button>
         </div>
       </div>
     </section>
 
-    <!-- 4. ANALYTICS VIEW -->
-    <section id="view-analytics" class="hidden py-8 px-4 max-w-7xl mx-auto w-full">
-      <div class="mb-6">
-        <h2 class="text-2xl font-black text-slate-800">Thống Kê Tiến Độ Luyện Thi</h2>
-        <p class="text-slate-500 text-sm">Lịch sử điểm số và thống kê kỹ năng cần cải thiện dựa trên kết quả luyện đề.</p>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-800 mb-4">Lịch Sử Điểm Số Các Lần Thi (IELTS / SAT)</h3>
-          <div class="h-64">
-            <canvas id="progressChart"></canvas>
-          </div>
+    <!-- VIEW TEACHER (BẢNG QUẢN LÝ CỦA GIÁO VIÊN) -->
+    <section id="view-teacher" class="hidden py-8 px-4 max-w-7xl mx-auto w-full">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-black text-slate-800">Quản Lý Bài Làm Học Sinh</h2>
+          <p class="text-slate-500 text-sm">Theo dõi điểm số, xem chi tiết bài làm, xóa bài hoặc xuất ra Excel.</p>
         </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-          <h3 class="text-base font-bold text-slate-800 mb-4">Độ Thành Thạo Theo Kỹ Năng / Dạng Bài</h3>
-          <div class="h-64 flex justify-center">
-            <canvas id="radarChart"></canvas>
-          </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportToCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm">
+            <i class="ph-bold ph-microsoft-excel-logo text-base"></i> Xuất File Excel (CSV)
+          </button>
+          <button onclick="loadTeacherSubmissions()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1.5 transition">
+            <i class="ph ph-arrow-counter-clockwise"></i> Làm mới
+          </button>
         </div>
       </div>
 
-      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-        <h3 class="text-amber-800 font-bold flex items-center gap-2">
-          <i class="ph-bold ph-lightbulb"></i> Khuyến Nghị Cải Thiện Dựa Trên Dữ Liệu
-        </h3>
-        <p class="text-amber-700 text-sm mt-1">
-          Tỷ lệ hoàn thành đúng ở phần <strong>HSG C1/C2 - Sentence Transformation</strong> và <strong>SAT Reading/Writing</strong> đang dưới 65%. Bạn nên làm thêm các đề thi chuyên sâu trước khi thi thật.
-        </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="text-xs font-bold text-slate-400 uppercase">Tổng bài nộp</div>
+          <div id="teacher-stat-total" class="text-3xl font-black text-slate-800 mt-1">0</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="text-xs font-bold text-slate-400 uppercase">Tỷ lệ đúng trung bình</div>
+          <div id="teacher-stat-avg" class="text-3xl font-black text-brand-600 mt-1">0%</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="text-xs font-bold text-slate-400 uppercase">Học sinh làm nhiều nhất</div>
+          <div id="teacher-stat-top-student" class="text-base font-bold text-indigo-600 mt-2 truncate">Chưa có</div>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-4 flex flex-col sm:flex-row gap-3">
+        <div class="flex-1 relative">
+          <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-base"></i>
+          <input type="text" id="search-student-input" oninput="applyTeacherFilter()" placeholder="Tìm theo tên học sinh hoặc email..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+        <div class="sm:w-64">
+          <select id="filter-exam-select" onchange="applyTeacherFilter()" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-medium outline-none">
+            <option value="ALL">Tất cả đề thi</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs font-bold uppercase tracking-wider">
+                <th class="p-4">Học Sinh</th>
+                <th class="p-4">Đề Thi</th>
+                <th class="p-4">Số Câu Đúng</th>
+                <th class="p-4">Điểm Quy Đổi</th>
+                <th class="p-4">Thời Gian Nộp</th>
+                <th class="p-4 text-center">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="teacher-submissions-tbody" class="divide-y divide-slate-100">
+              <tr>
+                <td colspan="6" class="p-8 text-center text-slate-400">Đang tải dữ liệu bài làm...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
+
+    <!-- MODAL XEM CHI TIẾT -->
+    <div id="teacher-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+          <div>
+            <h3 id="modal-student-name" class="font-bold text-slate-800 text-base">Bài làm chi tiết</h3>
+            <p id="modal-exam-title" class="text-xs text-slate-500">Đề thi...</p>
+          </div>
+          <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 p-1 text-xl">
+            <i class="ph ph-x"></i>
+          </button>
+        </div>
+        <div id="modal-answers-container" class="p-6 overflow-y-auto space-y-4"></div>
+      </div>
+    </div>
 
   </main>
 
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <!-- ================= JAVASCRIPT SYSTEM ================= -->
   <script>
-    /* 1. MOCK DATABASE */
-    const EXAMS_DATABASE = [
-      {
-        id: "ielts-reading-01",
-        title: "IELTS Reading Academic: Urban Farming Revolution",
-        category: "IELTS",
-        difficulty: "Hard",
-        year: "2026",
-        durationMinutes: 20,
-        hasAudio: false,
-        passage: `
-          <h3 class="text-lg font-bold text-slate-900 mb-3">The Rise of Vertical and Urban Farming</h3>
-          <p class="mb-3">By the year 2050, nearly 70% of the world's population is projected to live in urban areas. This rapid demographic shift poses profound questions regarding food security and ecological degradation.</p>
-          <p class="mb-3">Traditional horizontal agriculture consumes over 80% of our available freshwater resources and leads to severe habitat loss. Vertical farming, pioneered by Dr. Dickson Despommier, proposes cultivating crops inside controlled-environment skyscrapers.</p>
-          <p class="mb-3">Critics often emphasize the prohibitive capital costs associated with artificial LED lighting systems. However, proponents argue that closed-loop hydroponic systems reduce water expenditure by 95% compared to open-field farming.</p>
-        `,
-        questions: [
-          {
-            id: 1,
-            type: "mcq",
-            prompt: "What is predicted to happen by the year 2050?",
-            options: [
-              "Horizontal farming will be entirely outlawed",
-              "Around 70% of humans will reside in urban spaces",
-              "Skyscrapers will replace all agricultural zones",
-              "Freshwater reservoirs will be totally depleted"
-            ],
-            correctAnswer: 1,
-            explanation: "Dòng 1 trong bài đọc nêu rõ: 'nearly 70% of the world's population is projected to live in urban areas'."
-          },
-          {
-            id: 2,
-            type: "text",
-            prompt: "Vertical farming was pioneered by Dr. [blank]. (Điền họ tên)",
-            correctAnswer: "Dickson Despommier",
-            acceptable: ["Dickson Despommier", "dickson despommier"],
-            explanation: "Thông tin ở đoạn 2: 'pioneered by Dr. Dickson Despommier'."
-          }
-        ]
-      },
-      {
-        id: "ielts-listening-01",
-        title: "IELTS Listening Section 1: Library Membership Form",
-        category: "IELTS",
-        difficulty: "Medium",
-        year: "2025",
-        durationMinutes: 15,
-        hasAudio: true,
-        passage: `
-          <h3 class="text-lg font-bold text-slate-900 mb-2">IELTS Section 1: Audio Transcript Preview</h3>
-          <p class="text-slate-500 italic mb-4">Lắng nghe file ghi âm bên trên và điền thông tin vào chỗ trống.</p>
-          <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 text-xs">
-            <strong>Quy định:</strong> Điền KHÔNG QUÁ 2 TỪ VÀ/HOẶC 1 CON SỐ cho mỗi câu.
-          </div>
-        `,
-        questions: [
-          {
-            id: 1,
-            type: "text",
-            prompt: "Borrower's Street Name: [blank] Avenue.",
-            correctAnswer: "Greenwood",
-            acceptable: ["Greenwood", "greenwood"],
-            explanation: "Người gọi đánh vần: G-R-E-E-N-W-O-O-D Avenue."
-          },
-          {
-            id: 2,
-            type: "mcq",
-            prompt: "Which membership tier did the caller finally select?",
-            options: ["Student Basic", "Gold Executive", "Monthly Standard", "Senior Citizen"],
-            correctAnswer: 2,
-            explanation: "Người gọi nói: 'I will settle with the Monthly Standard option'."
-          }
-        ]
-      },
-      {
-        id: "hsg-tinh-01",
-        title: "Đề Thi Chọn HSG Tiếng Anh Cấp Tỉnh - C1/C2 Grammar & Inversion",
-        category: "HSG",
-        difficulty: "Hard",
-        year: "2026",
-        durationMinutes: 30,
-        hasAudio: false,
-        passage: `
-          <h3 class="text-lg font-bold text-slate-900 mb-2">Kỳ Thi Học Sinh Giỏi THPT - Chuyên Sâu C1/C2</h3>
-          <p class="mb-3">Kiểm tra kiến thức về Đảo ngữ (Inversion), Câu chẻ (Cleft sentence) và Cụm từ cố định.</p>
-        `,
-        questions: [
-          {
-            id: 1,
-            type: "mcq",
-            prompt: "Little ______ that the entire syndicate was monitored by federal authorities.",
-            options: [
-              "did the suspect suspect",
-              "the suspect did suspect",
-              "had the suspect suspected",
-              "was the suspect suspecting"
-            ],
-            correctAnswer: 0,
-            explanation: "Cấu trúc đảo ngữ: Little + Trợ động từ + S + V(nguyên mẫu). Chọn 'did the suspect suspect'."
-          },
-          {
-            id: 2,
-            type: "text",
-            prompt: "Viết lại câu sau dùng Cleft Sentence: 'John broke the vase yesterday.' -> It was [blank] broke the vase yesterday.",
-            correctAnswer: "John that",
-            acceptable: ["John that", "John who"],
-            explanation: "Cấu trúc câu chẻ: It was + S + that/who + V."
-          }
-        ]
-      },
-      {
-        id: "sat-rw-01",
-        title: "Digital SAT: Reading & Writing Module 1",
-        category: "SAT",
-        difficulty: "Hard",
-        year: "2025",
-        durationMinutes: 25,
-        hasAudio: false,
-        passage: `
-          <h3 class="text-lg font-bold text-slate-900 mb-2">Digital SAT Standard Workspace</h3>
-          <p class="mb-3">Some scientists posit that cetacean vocalizations display syntactic structures comparable to human dialects. Marine biologist Dr. Elena Vance examined blue whale song clusters over a decade, concluding that regional variants remain resilient against drift.</p>
-        `,
-        questions: [
-          {
-            id: 1,
-            type: "mcq",
-            prompt: "Which choice best describes the primary function of the underlined claim?",
-            options: [
-              "It invalidates the assumption that whale songs carry syntax.",
-              "It introduces empirical evidence supporting dialect persistence.",
-              "It repudiates Dr. Vance's method of acoustic observation.",
-              "It questions the evolutionary longevity of ocean mammals."
-            ],
-            correctAnswer: 1,
-            explanation: "Nghiên cứu của Dr. Elena Vance được dùng làm bằng chứng thực nghiệm (empirical evidence) ủng hộ nhận định."
-          }
-        ]
-      }
+    /* -------------------------------------------------------------
+       1. CẤU HÌNH FIREBASE VÀ EMAIL GIÁO VIÊN (SỬA Ở ĐÂY)
+       ------------------------------------------------------------- */
+    const firebaseConfig = {
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBQPADW2JL48w28yJcYVViUXmifs7aRi3Y",
+  authDomain: "prep-master-bluzzington.firebaseapp.com",
+  projectId: "prep-master-bluzzington",
+  storageBucket: "prep-master-bluzzington.firebasestorage.app",
+  messagingSenderId: "247432664150",
+  appId: "1:247432664150:web:20a46d338618746ebbd7f7",
+  measurementId: "G-Z660E52LLW"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+    };
+
+    // Điền chính xác địa chỉ Gmail của bạn tại đây:
+    const TEACHER_EMAILS = [
+      "bluzzington1@gmail.com"
     ];
 
-    /* 2. APP STATE */
-    let currentExam = null;
-    let currentQuestionIdx = 0;
-    let userAnswers = {};
-    let flaggedQuestions = new Set();
-    let timerInterval = null;
-    let secondsRemaining = 0;
-    let chartInstanceProgress = null;
-    let chartInstanceRadar = null;
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-    /* 3. ROUTER */
-    function switchView(viewName) {
-      document.getElementById('view-home').classList.add('hidden');
-      document.getElementById('view-exam').classList.add('hidden');
-      document.getElementById('view-result').classList.add('hidden');
-      document.getElementById('view-analytics').classList.add('hidden');
+    let currentUser = null;
+    let isTeacher = false;
 
-      if (viewName === 'home') {
-        document.getElementById('view-home').classList.remove('hidden');
-        clearInterval(timerInterval);
-      } else if (viewName === 'exam') {
-        document.getElementById('view-exam').classList.remove('hidden');
-      } else if (viewName === 'result') {
-        document.getElementById('view-result').classList.remove('hidden');
-      } else if (viewName === 'analytics') {
-        document.getElementById('view-analytics').classList.remove('hidden');
-        renderAnalyticsCharts();
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      const loginBtn = document.getElementById('login-btn');
+      const userProfile = document.getElementById('user-profile');
+      const teacherBtn = document.getElementById('nav-teacher-btn');
+      const teacherBadge = document.getElementById('teacher-badge');
 
-    /* 4. RENDER EXAMS */
-    function renderExamList() {
-      const cat = document.getElementById('filter-category').value;
-      const level = document.getElementById('filter-level').value;
-      const year = document.getElementById('filter-year').value;
+      if (user) {
+        loginBtn.classList.add('hidden');
+        userProfile.classList.remove('hidden');
+        document.getElementById('user-avatar').src = user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user';
+        document.getElementById('user-name').innerText = user.displayName || user.email;
 
-      const filtered = EXAMS_DATABASE.filter(exam => {
-        const matchCat = (cat === 'ALL' || exam.category === cat);
-        const matchLevel = (level === 'ALL' || exam.difficulty === level);
-        const matchYear = (year === 'ALL' || exam.year === year);
-        return matchCat && matchLevel && matchYear;
-      });
-
-      const container = document.getElementById('exam-cards-container');
-      container.innerHTML = '';
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400">Không tìm thấy đề thi phù hợp.</div>`;
-        return;
-      }
-
-      filtered.forEach(exam => {
-        const card = document.createElement('div');
-        card.className = "bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between";
-
-        const badgeColor = exam.category === 'IELTS' ? 'bg-red-50 text-red-600 border-red-200' 
-                          : exam.category === 'HSG' ? 'bg-indigo-50 text-indigo-600 border-indigo-200' 
-                          : 'bg-emerald-50 text-emerald-600 border-emerald-200';
-
-        card.innerHTML = `
-          <div>
-            <div class="flex items-center justify-between mb-3">
-              <span class="px-2.5 py-1 text-xs font-bold rounded-md border ${badgeColor}">${exam.category}</span>
-              <span class="text-xs font-semibold text-slate-400">${exam.year} • ${exam.difficulty}</span>
-            </div>
-            <h3 class="text-base font-bold text-slate-800 line-clamp-2">${exam.title}</h3>
-            <div class="mt-4 flex items-center gap-4 text-xs text-slate-500">
-              <span class="flex items-center gap-1"><i class="ph ph-clock"></i> ${exam.durationMinutes} phút</span>
-              <span class="flex items-center gap-1"><i class="ph ph-list-numbers"></i> ${exam.questions.length} câu hỏi</span>
-              ${exam.hasAudio ? '<span class="flex items-center gap-1 text-brand-600 font-semibold"><i class="ph ph-headphones"></i> Audio</span>' : ''}
-            </div>
-          </div>
-          <button onclick="startExam('${exam.id}')" class="mt-5 w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
-            Bắt đầu làm bài <i class="ph ph-caret-right"></i>
-          </button>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function resetFilters() {
-      document.getElementById('filter-category').value = 'ALL';
-      document.getElementById('filter-level').value = 'ALL';
-      document.getElementById('filter-year').value = 'ALL';
-      renderExamList();
-    }
-
-    /* 5. EXAM ENGINE */
-    function startExam(examId) {
-      currentExam = EXAMS_DATABASE.find(e => e.id === examId);
-      currentQuestionIdx = 0;
-      userAnswers = {};
-      flaggedQuestions.clear();
-
-      document.getElementById('exam-title-header').innerText = currentExam.title;
-      document.getElementById('exam-badge').innerText = currentExam.category;
-      document.getElementById('exam-passage-content').innerHTML = currentExam.passage;
-
-      const audioContainer = document.getElementById('listening-audio-player-container');
-      if (currentExam.hasAudio) {
-        audioContainer.classList.remove('hidden');
-      } else {
-        audioContainer.classList.add('hidden');
-      }
-
-      secondsRemaining = currentExam.durationMinutes * 60;
-      clearInterval(timerInterval);
-      updateTimerDisplay();
-      timerInterval = setInterval(() => {
-        secondsRemaining--;
-        updateTimerDisplay();
-        if (secondsRemaining <= 0) {
-          clearInterval(timerInterval);
-          alert('Hết giờ làm bài! Hệ thống tự động nộp bài.');
-          submitExam();
+        if (TEACHER_EMAILS.includes(user.email.toLowerCase())) {
+          isTeacher = true;
+          teacherBtn.classList.remove('hidden');
+          teacherBtn.classList.add('flex');
+          teacherBadge.classList.remove('hidden');
+        } else {
+          isTeacher = false;
+          teacherBtn.classList.add('hidden');
+          teacherBadge.classList.add('hidden');
         }
-      }, 1000);
-
-      renderQuestionPalette();
-      renderCurrentQuestion();
-      switchView('exam');
-    }
-
-    function updateTimerDisplay() {
-      const mins = Math.floor(secondsRemaining / 60);
-      const secs = secondsRemaining % 60;
-      document.getElementById('timer-display').innerText = 
-        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function renderQuestionPalette() {
-      const palette = document.getElementById('question-palette');
-      palette.innerHTML = '';
-
-      currentExam.questions.forEach((q, idx) => {
-        const btn = document.createElement('button');
-        btn.id = `palette-btn-${idx}`;
-        const isCurrent = idx === currentQuestionIdx;
-        const isAnswered = userAnswers[q.id] !== undefined && userAnswers[q.id] !== '';
-        const isFlagged = flaggedQuestions.has(q.id);
-
-        let bgClass = "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200";
-        if (isCurrent) bgClass = "ring-2 ring-brand-600 bg-brand-50 text-brand-600 font-bold";
-        else if (isFlagged) bgClass = "bg-amber-100 text-amber-700 border-amber-300 font-bold";
-        else if (isAnswered) bgClass = "bg-brand-600 text-white font-bold";
-
-        btn.className = `w-7 h-7 rounded-md text-xs border flex items-center justify-center transition ${bgClass}`;
-        btn.innerText = idx + 1;
-        btn.onclick = () => {
-          currentQuestionIdx = idx;
-          renderCurrentQuestion();
-          renderQuestionPalette();
-        };
-        palette.appendChild(btn);
-      });
-    }
-
-    function renderCurrentQuestion() {
-      const q = currentExam.questions[currentQuestionIdx];
-      const container = document.getElementById('question-container');
-      
-      document.getElementById('current-question-indicator').innerText = `Câu ${currentQuestionIdx + 1} / ${currentExam.questions.length}`;
-      document.getElementById('prev-question-btn').disabled = currentQuestionIdx === 0;
-      document.getElementById('next-question-btn').disabled = currentQuestionIdx === currentExam.questions.length - 1;
-
-      const flagBtn = document.getElementById('flag-btn');
-      if (flaggedQuestions.has(q.id)) {
-        flagBtn.className = "ml-3 px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-300 rounded-md flex items-center gap-1 shrink-0";
-        flagBtn.innerHTML = `<i class="ph-fill ph-flag"></i> Đã đánh dấu`;
       } else {
-        flagBtn.className = "ml-3 px-2.5 py-1 text-xs font-medium border border-slate-200 rounded-md hover:bg-slate-100 flex items-center gap-1 text-slate-600 shrink-0";
-        flagBtn.innerHTML = `<i class="ph ph-flag"></i> Đánh dấu (Flag)`;
+        loginBtn.classList.remove('hidden');
+        userProfile.classList.add('hidden');
+        teacherBtn.classList.add('hidden');
+        isTeacher = false;
       }
-
-      let inputHtml = '';
-      if (q.type === 'mcq') {
-        inputHtml = `
-          <div class="space-y-2.5 mt-4">
-            ${q.options.map((opt, oIdx) => {
-              const checked = userAnswers[q.id] === oIdx ? 'checked' : '';
-              return `
-                <label class="flex items-center p-3.5 border rounded-xl cursor-pointer hover:bg-slate-50 transition ${checked ? 'border-brand-500 bg-brand-50/40 ring-1 ring-brand-500' : 'border-slate-200'}">
-                  <input type="radio" name="question-${q.id}" value="${oIdx}" ${checked} onchange="saveAnswer(${q.id}, ${oIdx})" class="w-4 h-4 text-brand-600 focus:ring-brand-500">
-                  <span class="ml-3 text-sm font-medium text-slate-700">${opt}</span>
-                </label>
-              `;
-            }).join('')}
-          </div>
-        `;
-      } else if (q.type === 'text') {
-        const val = userAnswers[q.id] || '';
-        inputHtml = `
-          <div class="mt-4">
-            <input type="text" value="${val}" oninput="saveAnswer(${q.id}, this.value)" placeholder="Nhập câu trả lời..." 
-              class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none">
-          </div>
-        `;
-      }
-
-      container.innerHTML = `
-        <div>
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Câu hỏi số ${currentQuestionIdx + 1}</span>
-          <h4 class="text-base font-bold text-slate-800 mt-1">${q.prompt}</h4>
-          ${inputHtml}
-        </div>
-      `;
-    }
-
-    function saveAnswer(questionId, value) {
-      userAnswers[questionId] = value;
-      renderQuestionPalette();
-    }
-
-    function toggleFlagCurrentQuestion() {
-      const q = currentExam.questions[currentQuestionIdx];
-      if (flaggedQuestions.has(q.id)) {
-        flaggedQuestions.delete(q.id);
-      } else {
-        flaggedQuestions.add(q.id);
-      }
-      renderQuestionPalette();
-      renderCurrentQuestion();
-    }
-
-    function navigateQuestion(direction) {
-      const newIdx = currentQuestionIdx + direction;
-      if (newIdx >= 0 && newIdx < currentExam.questions.length) {
-        currentQuestionIdx = newIdx;
-        renderCurrentQuestion();
-        renderQuestionPalette();
-      }
-    }
-
-    function confirmSubmitExam() {
-      if (confirm('Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?')) {
-        submitExam();
-      }
-    }
-
-    /* 6. SUBMISSION & SCORING */
-    function submitExam() {
-      clearInterval(timerInterval);
-
-      let correctCount = 0;
-      const detailsContainer = document.getElementById('result-details-container');
-      detailsContainer.innerHTML = '';
-
-      currentExam.questions.forEach((q, idx) => {
-        const userAns = userAnswers[q.id];
-        let isCorrect = false;
-
-        if (q.type === 'mcq') {
-          isCorrect = (userAns !== undefined && Number(userAns) === q.correctAnswer);
-        } else if (q.type === 'text') {
-          if (userAns && typeof userAns === 'string') {
-            const normalized = userAns.trim().toLowerCase();
-            isCorrect = q.acceptable.some(a => a.toLowerCase() === normalized);
-          }
-        }
-
-        if (isCorrect) correctCount++;
-
-        const card = document.createElement('div');
-        card.className = `p-4 rounded-xl border ${isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-rose-200 bg-rose-50/20'}`;
-        card.innerHTML = `
-          <div class="flex items-start justify-between">
-            <div class="font-bold text-sm text-slate-800">Câu ${idx + 1}: ${q.prompt}</div>
-            <span class="text-xs font-black uppercase px-2 py-0.5 rounded ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">
-              ${isCorrect ? 'Đúng' : 'Sai'}
-            </span>
-          </div>
-          <div class="text-xs text-slate-600 mt-2">
-            <strong>Bạn chọn:</strong> ${userAns !== undefined ? (q.type === 'mcq' ? q.options[userAns] : userAns) : '<span class="italic text-slate-400">Chưa làm</span>'}
-          </div>
-          <div class="text-xs text-emerald-700 mt-1">
-            <strong>Đáp án đúng:</strong> ${q.type === 'mcq' ? q.options[q.correctAnswer] : q.correctAnswer}
-          </div>
-          <div class="text-xs bg-white p-2.5 rounded-lg border border-slate-200 mt-2 text-slate-700">
-            <strong><i class="ph ph-info"></i> Giải thích chi tiết:</strong> ${q.explanation}
-          </div>
-        `;
-        detailsContainer.appendChild(card);
-      });
-
-      let scoreBadge = "";
-      if (currentExam.category === 'IELTS') {
-        const band = (correctCount / currentExam.questions.length) * 9.0;
-        scoreBadge = `Band ${band.toFixed(1)}`;
-      } else if (currentExam.category === 'SAT') {
-        const satScore = Math.round((correctCount / currentExam.questions.length) * 800);
-        scoreBadge = `${satScore} / 800`;
-      } else {
-        const hsgScore = ((correctCount / currentExam.questions.length) * 20).toFixed(2);
-        scoreBadge = `${hsgScore} / 20đ`;
-      }
-
-      document.getElementById('result-exam-title').innerText = currentExam.title;
-      document.getElementById('result-band').innerText = scoreBadge;
-      document.getElementById('result-correct').innerText = `${correctCount}/${currentExam.questions.length}`;
-      
-      const elapsedMins = currentExam.durationMinutes - Math.ceil(secondsRemaining / 60);
-      document.getElementById('result-time').innerText = `${Math.max(1, elapsedMins)} phút`;
-
-      switchView('result');
-    }
-
-    /* 7. CHARTS */
-    function renderAnalyticsCharts() {
-      const ctxLine = document.getElementById('progressChart').getContext('2d');
-      if (chartInstanceProgress) chartInstanceProgress.destroy();
-      chartInstanceProgress = new Chart(ctxLine, {
-        type: 'line',
-        data: {
-          labels: ['Test 1', 'Test 2', 'Test 3', 'Test 4', 'Test 5'],
-          datasets: [{
-            label: 'IELTS Band Score',
-            data: [6.0, 6.5, 6.5, 7.0, 7.5],
-            borderColor: '#0284c7',
-            backgroundColor: 'rgba(2, 132, 199, 0.1)',
-            fill: true,
-            tension: 0.3,
-            borderWidth: 2,
-            pointRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { min: 4, max: 9, ticks: { stepSize: 1 } }
-          }
-        }
-      });
-
-      const ctxRadar = document.getElementById('radarChart').getContext('2d');
-      if (chartInstanceRadar) chartInstanceRadar.destroy();
-      chartInstanceRadar = new Chart(ctxRadar, {
-        type: 'radar',
-        data: {
-          labels: ['IELTS Reading', 'IELTS Listening', 'HSG Grammar C1/C2', 'SAT Reading/Writing', 'Vocabulary In Context'],
-          datasets: [{
-            label: 'Độ chính xác (%)',
-            data: [85, 75, 55, 70, 90],
-            backgroundColor: 'rgba(99, 102, 241, 0.2)',
-            borderColor: '#6366f1',
-            pointBackgroundColor: '#6366f1'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            r: { min: 0, max: 100, ticks: { stepSize: 20 } }
-          }
-        }
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      renderExamList();
     });
-  </script>
-</body>
-</html>
+
+    function loginWithGoogle() {
+      auth.signInWithPopup(googleProvider).catch(err => alert("Lỗi đăng nhập:
