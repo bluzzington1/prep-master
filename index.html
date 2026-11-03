@@ -336,17 +336,16 @@
        2. CẤU HÌNH FIREBASE VÀ EMAIL GIÁO VIÊN
        ------------------------------------------------------------- */
     const firebaseConfig = {
-  apiKey: "AIzaSyBQPADW2JL48w28yJcYVViUXmifs7aRi3Y",
-  authDomain: "prep-master-bluzzington.firebaseapp.com",
-  projectId: "prep-master-bluzzington",
-  storageBucket: "prep-master-bluzzington.firebasestorage.app",
-  messagingSenderId: "247432664150",
-  appId: "1:247432664150:web:20a46d338618746ebbd7f7",
-  measurementId: "G-Z660E52LLW"
+      apiKey: "AIzaSy_THAY_API_KEY_CUA_BAN_VAO_DAY",
+      authDomain: "du-an-cua-ban.firebaseapp.com",
+      projectId: "du-an-cua-ban",
+      storageBucket: "du-an-cua-ban.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
     };
 
     const TEACHER_EMAILS = [
-      "bluzzington1@gmail."
+      "email-cua-ban@gmail.com"
     ];
 
     let auth = null;
@@ -366,3 +365,468 @@
         auth.onAuthStateChanged(user => {
           currentUser = user;
           const loginBtn = document.getElementById('login-btn');
+          const userProfile = document.getElementById('user-profile');
+          const teacherBtn = document.getElementById('nav-teacher-btn');
+          const teacherBadge = document.getElementById('teacher-badge');
+
+          if (user) {
+            loginBtn.classList.add('hidden');
+            userProfile.classList.remove('hidden');
+            document.getElementById('user-avatar').src = user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user';
+            document.getElementById('user-name').innerText = user.displayName || user.email;
+
+            if (TEACHER_EMAILS.includes(user.email.toLowerCase())) {
+              isTeacher = true;
+              teacherBtn.classList.remove('hidden');
+              teacherBtn.classList.add('flex');
+              teacherBadge.classList.remove('hidden');
+            } else {
+              isTeacher = false;
+              teacherBtn.classList.add('hidden');
+              teacherBadge.classList.add('hidden');
+            }
+          } else {
+            loginBtn.classList.remove('hidden');
+            userProfile.classList.add('hidden');
+            teacherBtn.classList.add('hidden');
+            isTeacher = false;
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("Chưa cấu hình Firebase hoặc cấu hình chưa đúng:", e);
+    }
+
+    function loginWithGoogle() {
+      if (!auth) {
+        alert("⚠️ Bạn chưa điền mã Firebase vào file index.html! Vui lòng mở file và thay apiKey từ Firebase của bạn vào.");
+        return;
+      }
+      auth.signInWithPopup(googleProvider).catch(err => {
+        if (err.code === "auth/unauthorized-domain") {
+          alert("❌ LỖI BẢO MẬT: Tên miền này chưa được thêm vào Firebase!\n\n👉 Cách sửa: Vào Firebase Console -> Authentication -> Settings -> Authorized domains -> Bấm 'Add domain' và dán tên miền github.io vào.");
+        } else if (err.code === "auth/popup-blocked") {
+          alert("❌ Trình duyệt đã chặn cửa sổ Popup đăng nhập. Vui lòng bấm 'Cho phép mở cửa sổ bật lên' trên trình duyệt của bạn.");
+        } else {
+          alert("Lỗi đăng nhập: " + err.message);
+        }
+      });
+    }
+
+    function logout() {
+      if (auth) auth.signOut().then(() => switchView('home'));
+    }
+
+    /* -------------------------------------------------------------
+       3. ENGINE LÀM BÀI
+       ------------------------------------------------------------- */
+    let currentExam = null;
+    let currentQuestionIdx = 0;
+    let userAnswers = {};
+    let flaggedQuestions = new Set();
+    let timerInterval = null;
+    let secondsRemaining = 0;
+
+    function startExam(examId) {
+      if (auth && !currentUser) {
+        alert("⚠️ Bạn bắt buộc phải đăng nhập Google để làm bài!");
+        loginWithGoogle();
+        return;
+      }
+
+      currentExam = EXAMS_DATABASE.find(e => e.id === examId);
+      currentQuestionIdx = 0;
+      userAnswers = {};
+      flaggedQuestions.clear();
+
+      document.getElementById('exam-title-header').innerText = currentExam.title;
+      document.getElementById('exam-badge').innerText = currentExam.category;
+      document.getElementById('exam-passage-content').innerHTML = currentExam.passage;
+
+      secondsRemaining = currentExam.durationMinutes * 60;
+      clearInterval(timerInterval);
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        secondsRemaining--;
+        updateTimerDisplay();
+        if (secondsRemaining <= 0) {
+          clearInterval(timerInterval);
+          alert('Hết giờ làm bài!');
+          submitExam();
+        }
+      }, 1000);
+
+      renderQuestionPalette();
+      renderCurrentQuestion();
+      switchView('exam');
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(secondsRemaining / 60);
+      const secs = secondsRemaining % 60;
+      document.getElementById('timer-display').innerText = 
+        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function renderQuestionPalette() {
+      const palette = document.getElementById('question-palette');
+      palette.innerHTML = '';
+      currentExam.questions.forEach((q, idx) => {
+        const btn = document.createElement('button');
+        const isCurrent = idx === currentQuestionIdx;
+        const isAnswered = userAnswers[q.id] !== undefined && userAnswers[q.id] !== '';
+        const isFlagged = flaggedQuestions.has(q.id);
+
+        let bgClass = "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200";
+        if (isCurrent) bgClass = "ring-2 ring-brand-600 bg-brand-50 text-brand-600 font-bold";
+        else if (isFlagged) bgClass = "bg-amber-100 text-amber-700 border-amber-300 font-bold";
+        else if (isAnswered) bgClass = "bg-brand-600 text-white font-bold";
+
+        btn.className = `w-7 h-7 rounded-md text-xs border flex items-center justify-center transition ${bgClass}`;
+        btn.innerText = idx + 1;
+        btn.onclick = () => { currentQuestionIdx = idx; renderCurrentQuestion(); renderQuestionPalette(); };
+        palette.appendChild(btn);
+      });
+    }
+
+    function renderCurrentQuestion() {
+      const q = currentExam.questions[currentQuestionIdx];
+      const container = document.getElementById('question-container');
+      
+      document.getElementById('current-question-indicator').innerText = `Câu ${currentQuestionIdx + 1} / ${currentExam.questions.length}`;
+      document.getElementById('prev-question-btn').disabled = currentQuestionIdx === 0;
+      document.getElementById('next-question-btn').disabled = currentQuestionIdx === currentExam.questions.length - 1;
+
+      let inputHtml = '';
+      if (q.type === 'mcq') {
+        inputHtml = `
+          <div class="space-y-2.5 mt-4">
+            ${q.options.map((opt, oIdx) => `
+              <label class="flex items-center p-3.5 border rounded-xl cursor-pointer hover:bg-slate-50 transition ${userAnswers[q.id] === oIdx ? 'border-brand-500 bg-brand-50/40 ring-1 ring-brand-500' : 'border-slate-200'}">
+                <input type="radio" name="q-${q.id}" value="${oIdx}" ${userAnswers[q.id] === oIdx ? 'checked' : ''} onchange="saveAnswer(${q.id}, ${oIdx})" class="w-4 h-4 text-brand-600">
+                <span class="ml-3 text-sm font-medium text-slate-700">${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        inputHtml = `
+          <div class="mt-4">
+            <input type="text" value="${userAnswers[q.id] || ''}" oninput="saveAnswer(${q.id}, this.value)" placeholder="Nhập đáp án..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div>
+          <span class="text-xs font-bold text-slate-400 uppercase">Câu hỏi số ${currentQuestionIdx + 1}</span>
+          <h4 class="text-base font-bold text-slate-800 mt-1">${q.prompt}</h4>
+          ${inputHtml}
+        </div>
+      `;
+    }
+
+    function saveAnswer(qId, val) { userAnswers[qId] = val; renderQuestionPalette(); }
+    function toggleFlagCurrentQuestion() {
+      const qId = currentExam.questions[currentQuestionIdx].id;
+      if (flaggedQuestions.has(qId)) flaggedQuestions.delete(qId);
+      else flaggedQuestions.add(qId);
+      renderQuestionPalette();
+    }
+    function navigateQuestion(d) { currentQuestionIdx += d; renderCurrentQuestion(); renderQuestionPalette(); }
+    function confirmSubmitExam() { if (confirm('Bạn có chắc chắn muốn nộp bài?')) submitExam(); }
+
+    /* -------------------------------------------------------------
+       4. CHẤM BÀI & LƯU FIREBASE
+       ------------------------------------------------------------- */
+    function submitExam() {
+      clearInterval(timerInterval);
+      let correctCount = 0;
+      const detailsContainer = document.getElementById('result-details-container');
+      detailsContainer.innerHTML = '';
+      const detailedAnswersToSave = [];
+
+      currentExam.questions.forEach((q, idx) => {
+        const userAns = userAnswers[q.id];
+        let isCorrect = false;
+
+        if (q.type === 'mcq') {
+          isCorrect = (userAns !== undefined && Number(userAns) === q.correctAnswer);
+        } else if (q.type === 'text') {
+          if (userAns && typeof userAns === 'string') {
+            isCorrect = q.acceptable.some(a => a.toLowerCase() === userAns.trim().toLowerCase());
+          }
+        }
+        if (isCorrect) correctCount++;
+
+        detailedAnswersToSave.push({
+          questionId: q.id,
+          prompt: q.prompt,
+          userAnswer: userAns !== undefined ? (q.type === 'mcq' ? q.options[userAns] : userAns) : "Không trả lời",
+          correctAnswer: q.type === 'mcq' ? q.options[q.correctAnswer] : q.correctAnswer,
+          isCorrect: isCorrect,
+          explanation: q.explanation
+        });
+
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl border ${isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-rose-200 bg-rose-50/20'}`;
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div class="font-bold text-sm text-slate-800">Câu ${idx + 1}: ${q.prompt}</div>
+            <span class="text-xs font-black px-2 py-0.5 rounded ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${isCorrect ? 'Đúng' : 'Sai'}</span>
+          </div>
+          <div class="text-xs text-slate-600 mt-2"><strong>Bạn chọn:</strong> ${userAns !== undefined ? (q.type === 'mcq' ? q.options[userAns] : userAns) : 'Chưa làm'}</div>
+          <div class="text-xs text-emerald-700 mt-1"><strong>Đáp án đúng:</strong> ${q.type === 'mcq' ? q.options[q.correctAnswer] : q.correctAnswer}</div>
+          <div class="text-xs bg-white p-2 rounded-lg border border-slate-200 mt-2 text-slate-700"><strong>Giải thích:</strong> ${q.explanation}</div>
+        `;
+        detailsContainer.appendChild(card);
+      });
+
+      let scoreBadge = "";
+      if (currentExam.category === 'IELTS') {
+        scoreBadge = `Band ${((correctCount / currentExam.questions.length) * 9.0).toFixed(1)}`;
+      } else if (currentExam.category === 'SAT') {
+        scoreBadge = `${Math.round((correctCount / currentExam.questions.length) * 800)} / 800`;
+      } else {
+        scoreBadge = `${((correctCount / currentExam.questions.length) * 20).toFixed(2)} / 20đ`;
+      }
+
+      document.getElementById('result-exam-title').innerText = currentExam.title;
+      document.getElementById('result-band').innerText = scoreBadge;
+      document.getElementById('result-correct').innerText = `${correctCount}/${currentExam.questions.length}`;
+      document.getElementById('result-time').innerText = `${Math.max(1, currentExam.durationMinutes - Math.ceil(secondsRemaining / 60))} phút`;
+
+      if (db && currentUser) {
+        db.collection("submissions").add({
+          studentName: currentUser.displayName || "Ẩn danh",
+          studentEmail: currentUser.email,
+          studentPhoto: currentUser.photoURL || "",
+          examId: currentExam.id,
+          examTitle: currentExam.title,
+          category: currentExam.category,
+          correctCount: correctCount,
+          totalQuestions: currentExam.questions.length,
+          scoreBadge: scoreBadge,
+          percentage: Math.round((correctCount / currentExam.questions.length) * 100),
+          detailedAnswers: detailedAnswersToSave,
+          submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => console.log("Lưu bài thi thành công!"));
+      }
+
+      switchView('result');
+    }
+
+    /* -------------------------------------------------------------
+       5. QUẢN LÝ BÀI HỌC SINH (GIÁO VIÊN)
+       ------------------------------------------------------------- */
+    let submissionsCache = [];
+
+    function loadTeacherSubmissions() {
+      if (!isTeacher || !db) return;
+      const tbody = document.getElementById('teacher-submissions-tbody');
+      tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Đang tải danh sách bài làm...</td></tr>`;
+
+      db.collection("submissions").orderBy("submittedAt", "desc").get().then(snapshot => {
+        submissionsCache = [];
+        const examSelect = document.getElementById('filter-exam-select');
+        const examOptions = new Set();
+
+        snapshot.forEach(doc => {
+          const sub = doc.data();
+          sub.docId = doc.id;
+          submissionsCache.push(sub);
+          if (sub.examTitle) examOptions.add(sub.examTitle);
+        });
+
+        examSelect.innerHTML = `<option value="ALL">Tất cả đề thi</option>`;
+        examOptions.forEach(title => {
+          examSelect.innerHTML += `<option value="${title}">${title}</option>`;
+        });
+
+        renderSubmissionsTable(submissionsCache);
+      }).catch(err => {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-rose-500">Lỗi kết nối: ${err.message}</td></tr>`;
+      });
+    }
+
+    function renderSubmissionsTable(data) {
+      const tbody = document.getElementById('teacher-submissions-tbody');
+      tbody.innerHTML = '';
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Không tìm thấy bài nộp nào.</td></tr>`;
+        document.getElementById('teacher-stat-total').innerText = 0;
+        document.getElementById('teacher-stat-avg').innerText = "0%";
+        return;
+      }
+
+      let totalPct = 0;
+      const studentCount = {};
+
+      data.forEach(sub => {
+        totalPct += (sub.percentage || 0);
+        studentCount[sub.studentName] = (studentCount[sub.studentName] || 0) + 1;
+
+        let dateStr = "Vừa nộp";
+        if (sub.submittedAt && sub.submittedAt.toDate) {
+          const d = sub.submittedAt.toDate();
+          dateStr = `${d.getHours()}:${d.getMinutes()} - ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="p-4 flex items-center gap-3">
+            <img src="${sub.studentPhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}" class="w-8 h-8 rounded-full border border-slate-200">
+            <div>
+              <div class="font-bold text-slate-800">${sub.studentName}</div>
+              <div class="text-xs text-slate-400">${sub.studentEmail}</div>
+            </div>
+          </td>
+          <td class="p-4 font-medium text-slate-700">${sub.examTitle}</td>
+          <td class="p-4 font-bold text-slate-800">${sub.correctCount} / ${sub.totalQuestions}</td>
+          <td class="p-4"><span class="px-2.5 py-1 text-xs font-black rounded-md bg-brand-50 text-brand-600 border border-brand-200">${sub.scoreBadge}</span></td>
+          <td class="p-4 text-xs text-slate-500">${dateStr}</td>
+          <td class="p-4 text-center">
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="viewStudentDetail('${sub.docId}')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition">Xem bài</button>
+              <button onclick="deleteSubmission('${sub.docId}', '${sub.studentName}')" class="px-2.5 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-xs font-bold transition">Xóa</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('teacher-stat-total').innerText = data.length;
+      document.getElementById('teacher-stat-avg').innerText = Math.round(totalPct / data.length) + "%";
+      const topStudent = Object.keys(studentCount).reduce((a, b) => studentCount[a] > studentCount[b] ? a : b, "Chưa có");
+      document.getElementById('teacher-stat-top-student').innerText = topStudent;
+    }
+
+    function applyTeacherFilter() {
+      const keyword = document.getElementById('search-student-input').value.toLowerCase().trim();
+      const examTitle = document.getElementById('filter-exam-select').value;
+      const filtered = submissionsCache.filter(sub => {
+        const matchName = sub.studentName.toLowerCase().includes(keyword) || sub.studentEmail.toLowerCase().includes(keyword);
+        const matchExam = (examTitle === "ALL" || sub.examTitle === examTitle);
+        return matchName && matchExam;
+      });
+      renderSubmissionsTable(filtered);
+    }
+
+    function deleteSubmission(docId, studentName) {
+      if (!db) return;
+      if (confirm(`Bạn có chắc muốn xóa bài làm của "${studentName}"?`)) {
+        db.collection("submissions").doc(docId).delete().then(() => {
+          alert("Đã xóa bài làm!");
+          loadTeacherSubmissions();
+        });
+      }
+    }
+
+    function exportToCSV() {
+      if (submissionsCache.length === 0) return alert("Chưa có dữ liệu bài nộp!");
+      let csv = "\uFEFFTên Học Sinh,Email,Đề Thi,Số Câu Đúng,Tổng Số Câu,Điểm Quy Đổi,Thời Gian Nộp\n";
+      submissionsCache.forEach(sub => {
+        let dateStr = "Vừa nộp";
+        if (sub.submittedAt && sub.submittedAt.toDate) {
+          const d = sub.submittedAt.toDate();
+          dateStr = `${d.getHours()}:${d.getMinutes()} ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+        }
+        csv += `"${sub.studentName}","${sub.studentEmail}","${sub.examTitle}",${sub.correctCount},${sub.totalQuestions},"${sub.scoreBadge}","${dateStr}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Bang_Diem_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+    }
+
+    function viewStudentDetail(docId) {
+      const sub = submissionsCache.find(s => s.docId === docId);
+      if (!sub) return;
+      document.getElementById('modal-student-name').innerText = `Bài làm của: ${sub.studentName} (${sub.studentEmail})`;
+      document.getElementById('modal-exam-title').innerText = `${sub.examTitle} • Điểm: ${sub.scoreBadge}`;
+      const container = document.getElementById('modal-answers-container');
+      container.innerHTML = '';
+      if (!sub.detailedAnswers) return;
+      sub.detailedAnswers.forEach((ans, i) => {
+        const div = document.createElement('div');
+        div.className = `p-4 rounded-xl border ${ans.isCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-rose-200 bg-rose-50/20'}`;
+        div.innerHTML = `
+          <div class="flex items-start justify-between">
+            <span class="font-bold text-sm text-slate-800">Câu ${i+1}: ${ans.prompt}</span>
+            <span class="text-xs font-black px-2 py-0.5 rounded ${ans.isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${ans.isCorrect ? 'ĐÚNG' : 'SAI'}</span>
+          </div>
+          <div class="text-xs text-slate-600 mt-2">Học sinh trả lời: <b class="${ans.isCorrect ? 'text-emerald-700' : 'text-rose-600'}">${ans.userAnswer}</b></div>
+          <div class="text-xs text-emerald-700 mt-1">Đáp án đúng: <b>${ans.correctAnswer}</b></div>
+        `;
+        container.appendChild(div);
+      });
+      document.getElementById('teacher-detail-modal').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('teacher-detail-modal').classList.add('hidden');
+    }
+
+    function switchView(viewName) {
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('view-exam').classList.add('hidden');
+      document.getElementById('view-result').classList.add('hidden');
+      document.getElementById('view-teacher').classList.add('hidden');
+      if (viewName === 'home') document.getElementById('view-home').classList.remove('hidden');
+      else if (viewName === 'exam') document.getElementById('view-exam').classList.remove('hidden');
+      else if (viewName === 'result') document.getElementById('view-result').classList.remove('hidden');
+      else if (viewName === 'teacher') {
+        document.getElementById('view-teacher').classList.remove('hidden');
+        loadTeacherSubmissions();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderExamList() {
+      const cat = document.getElementById('filter-category') ? document.getElementById('filter-category').value : 'ALL';
+      const level = document.getElementById('filter-level') ? document.getElementById('filter-level').value : 'ALL';
+      const year = document.getElementById('filter-year') ? document.getElementById('filter-year').value : 'ALL';
+      const filtered = EXAMS_DATABASE.filter(exam => {
+        return (cat === 'ALL' || exam.category === cat) &&
+               (level === 'ALL' || exam.difficulty === level) &&
+               (year === 'ALL' || exam.year === year);
+      });
+      const container = document.getElementById('exam-cards-container');
+      if (!container) return;
+      container.innerHTML = '';
+      filtered.forEach(exam => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-md border bg-brand-50 text-brand-600 border-brand-200">${exam.category}</span>
+              <span class="text-xs font-semibold text-slate-400">${exam.year} • ${exam.difficulty}</span>
+            </div>
+            <h3 class="text-base font-bold text-slate-800 line-clamp-2">${exam.title}</h3>
+            <div class="mt-4 flex items-center gap-4 text-xs text-slate-500">
+              <span><i class="ph ph-clock"></i> ${exam.durationMinutes} phút</span>
+              <span><i class="ph ph-list-numbers"></i> ${exam.questions.length} câu</span>
+            </div>
+          </div>
+          <button onclick="startExam('${exam.id}')" class="mt-5 w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+            Bắt đầu làm bài <i class="ph ph-caret-right"></i>
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-category').value = 'ALL';
+      document.getElementById('filter-level').value = 'ALL';
+      document.getElementById('filter-year').value = 'ALL';
+      renderExamList();
+    }
+  </script>
+</body>
+</html>
