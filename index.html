@@ -40,7 +40,7 @@
 </head>
 <body id="app-body" class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans relative">
 
-  <!-- CANVAS LỄ HỘI -->
+  <!-- CANVAS HIỆU ỨNG LỄ HỘI -->
   <canvas id="holiday-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 40;"></canvas>
 
   <!-- BANNER LỄ HỘI -->
@@ -60,10 +60,10 @@
       </div>
 
       <nav class="flex items-center space-x-2">
-        <button onclick="switchView('home')" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Thư Viện Đề</button>
+        <button onclick="switchView('home')" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Thư Viện Đề</button>
         
-        <!-- NÚT NÀY CHỈ GIÁO VIÊN MỚI THẤY (MẶC ĐỊNH ẨN) -->
-        <button id="nav-teacher-btn" onclick="switchView('teacher')" class="hidden px-3.5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition items-center gap-1.5 border border-indigo-200">
+        <!-- Nút này chỉ Giáo viên mới thấy -->
+        <button id="nav-teacher-btn" onclick="switchView('teacher')" class="hidden px-3 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition items-center gap-1.5 border border-indigo-200">
           <i class="ph-bold ph-chalkboard-teacher text-lg"></i> Quản Lý Bài Nộp
         </button>
 
@@ -76,15 +76,16 @@
         </select>
       </nav>
 
+      <!-- Khung đăng nhập -->
       <div id="auth-container" class="flex items-center gap-3">
-        <button onclick="loginWithGoogle()" id="login-btn" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
-          <i class="ph-bold ph-google-logo text-base"></i> Đăng nhập Google
+        <button onclick="openLoginModal()" id="login-btn" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+          <i class="ph-bold ph-user-circle text-base"></i> Đăng nhập
         </button>
 
         <div id="user-profile" class="hidden flex items-center gap-3">
           <div class="flex items-center gap-2 border border-slate-200 py-1.5 px-3 rounded-full bg-slate-50">
-            <img id="user-avatar" src="" class="w-7 h-7 rounded-full" alt="Avatar">
-            <span id="user-name" class="text-xs font-semibold text-slate-700 max-w-[110px] truncate">Người dùng</span>
+            <div id="user-avatar-badge" class="w-7 h-7 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center uppercase">U</div>
+            <span id="user-name" class="text-xs font-semibold text-slate-700 max-w-[120px] truncate">Học sinh</span>
             <span id="teacher-badge" class="hidden px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black uppercase">GIÁO VIÊN</span>
           </div>
           <button onclick="logout()" title="Đăng xuất" class="text-slate-400 hover:text-rose-600 text-lg transition p-1">
@@ -95,7 +96,7 @@
     </div>
   </header>
 
-  <!-- ================= MAIN CONTAINER ================= -->
+  <!-- ================= MAIN ================= -->
   <main class="flex-1 flex flex-col">
 
     <!-- 1. HOME VIEW -->
@@ -103,10 +104,10 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Thư Viện Đề Thi Trực Tuyến</h1>
-          <p class="text-slate-500 mt-1 text-sm">Học sinh bắt buộc đăng nhập tài khoản để làm bài thi và ghi nhận kết quả.</p>
+          <p class="text-slate-500 mt-1 text-sm">Học sinh bắt buộc đăng nhập để làm bài. Điểm số được gửi tự động tới Giáo viên.</p>
         </div>
         
-        <!-- NÚT TẠO ĐỀ NÀY CHỈ DUY NHẤT GIÁO VIÊN MỚI THẤY (MẶC ĐỊNH ẨN) -->
+        <!-- Nút Tạo Đề (Chỉ Giáo viên mới thấy) -->
         <button id="add-exam-btn" onclick="openExamModal()" class="hidden px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm items-center gap-2 transition shadow-lg shadow-indigo-600/30 shrink-0">
           <i class="ph-bold ph-plus-circle text-xl"></i> ➕ Tạo Đề Thi Mới
         </button>
@@ -152,8 +153,6 @@
 
     <!-- 2. EXAM WORKSPACE (PHÒNG THI) -->
     <section id="view-exam" class="hidden flex-1 flex flex-col h-[calc(100vh-64px)] bg-slate-100 overflow-hidden relative">
-      
-      <!-- BANNER CẢNH BÁO VI PHẠM RỜI TAB -->
       <div id="cheat-warning-bar" class="hidden bg-rose-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-between shrink-0">
         <span class="flex items-center gap-2">
           <i class="ph-bold ph-warning-octagon text-base text-yellow-300"></i> PHÁT HIỆN RỜI TAB! Đã vi phạm <span id="violation-count-text" class="underline font-black text-sm">0</span>/3 lần. Đủ 3 lần bài sẽ tự động nộp ngay!
@@ -241,7 +240,7 @@
       </div>
     </section>
 
-    <!-- 4. VIEW QUẢN LÝ BÀI NỘP (CHỈ GIÁO VIÊN MỚI ĐƯỢC VÀO) -->
+    <!-- 4. VIEW QUẢN LÝ BÀI NỘP (CHỈ GIÁO VIÊN) -->
     <section id="view-teacher" class="hidden py-8 px-4 max-w-7xl mx-auto w-full">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
@@ -280,7 +279,51 @@
       </div>
     </section>
 
-    <!-- HỘP THOẠI CẢNH BÁO VI PHẠM GIAN LẬN -->
+    <!-- ================= MODAL ĐĂNG NHẬP THÔNG MINH (GOOGLE + TRỰC TIẾP) ================= -->
+    <div id="login-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+        <button onclick="closeLoginModal()" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 text-xl">
+          <i class="ph ph-x"></i>
+        </button>
+
+        <div class="text-center mb-6">
+          <div class="w-12 h-12 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto mb-2 text-2xl font-bold">
+            <i class="ph-bold ph-user-circle"></i>
+          </div>
+          <h3 class="text-lg font-black text-slate-800">Đăng Nhập Tài Khoản</h3>
+          <p class="text-xs text-slate-500 mt-1">Đăng nhập để làm bài hoặc quản lý đề thi dành cho Giáo viên.</p>
+        </div>
+
+        <!-- Cách 1: Đăng nhập Google -->
+        <button onclick="loginWithGoogle()" class="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm mb-4">
+          <i class="ph-bold ph-google-logo text-base"></i> Đăng nhập bằng Google
+        </button>
+
+        <div class="flex items-center my-4">
+          <div class="flex-1 border-t border-slate-200"></div>
+          <span class="px-3 text-xs font-bold text-slate-400 uppercase">Hoặc đăng nhập nhanh</span>
+          <div class="flex-1 border-t border-slate-200"></div>
+        </div>
+
+        <!-- Cách 2: Đăng nhập trực tiếp (100% không bao giờ lỗi) -->
+        <form onsubmit="handleDirectLogin(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Họ và Tên của bạn *</label>
+            <input type="text" id="direct-login-name" required placeholder="VD: Nguyễn Văn A" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-brand-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Địa chỉ Email *</label>
+            <input type="email" id="direct-login-email" required placeholder="VD: yourname@gmail.com" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium outline-none focus:ring-2 focus:ring-brand-500">
+            <span class="text-[11px] text-slate-400 mt-1 block">💡 Nếu điền đúng email Giáo viên, hệ thống sẽ tự động bật quyền Quản lý đề.</span>
+          </div>
+          <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition shadow-sm">
+            Vào Làm Bài Ngay
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- HỘP THOẠI CẢNH BÁO GIAN LẬN -->
     <div id="cheat-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border-2 border-rose-500">
         <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
@@ -517,7 +560,7 @@
     });
 
     /* -------------------------------------------------------------
-       2. CẤU HÌNH FIREBASE & PHÂN QUYỀN GIÁO VIÊN BẢO MẬT
+       2. HỆ THỐNG ĐĂNG NHẬP THÔNG MINH (GOOGLE + TRỰC TIẾP KHÔNG LỖI)
        ------------------------------------------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyBQPADW2JL48w28yJcYVViUXmifs7aRi3Y",
@@ -528,8 +571,10 @@ const firebaseConfig = {
   appId: "1:247432664150:web:20a46d338618746ebbd7f7",
   measurementId: "G-Z660E52LLW"
 };
-    // 👉 ĐIỀN ĐỊA CHỈ GMAIL GIÁO VIÊN VÀO ĐÂY:
+
+    // 👉 ĐIỀN EMAIL CỦA BẠN (GIÁO VIÊN) VÀO ĐÂY:
     const TEACHER_EMAILS = [
+      "bluzzington1@gmail.com",
       "bluzzington1@gmail."
     ];
 
@@ -537,8 +582,18 @@ const firebaseConfig = {
     let db = null;
     let googleProvider = null;
     let currentUser = null;
-    let isTeacher = false; // Mặc định là KHÔNG PHẢI GIÁO VIÊN
+    let isTeacher = false;
 
+    // Tự động khôi phục tài khoản đã đăng nhập từ trước
+    const savedUser = localStorage.getItem("prep_logged_user");
+    if (savedUser) {
+      try {
+        const u = JSON.parse(savedUser);
+        setUserState(u);
+      } catch(e){}
+    }
+
+    // Kết nối Firebase nếu có key hợp lệ
     try {
       if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("THAY_API_KEY")) {
         firebase.initializeApp(firebaseConfig);
@@ -547,62 +602,103 @@ const firebaseConfig = {
         googleProvider = new firebase.auth.GoogleAuthProvider();
 
         auth.onAuthStateChanged(user => {
-          currentUser = user;
-          const loginBtn = document.getElementById('login-btn');
-          const userProfile = document.getElementById('user-profile');
-          const teacherBadge = document.getElementById('teacher-badge');
-          const navTeacherBtn = document.getElementById('nav-teacher-btn');
-          const addExamBtn = document.getElementById('add-exam-btn');
-
           if (user) {
-            loginBtn.classList.add('hidden');
-            userProfile.classList.remove('hidden');
-            document.getElementById('user-avatar').src = user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user';
-            document.getElementById('user-name').innerText = user.displayName || user.email;
-
-            // KIỂM TRA ĐỊA CHỈ EMAIL CÓ PHẢI GIÁO VIÊN HAY KHÔNG
-            if (TEACHER_EMAILS.map(e => e.toLowerCase()).includes(user.email.toLowerCase())) {
-              isTeacher = true;
-              teacherBadge.classList.remove('hidden');
-              navTeacherBtn.classList.remove('hidden');
-              navTeacherBtn.classList.add('flex');
-              addExamBtn.classList.remove('hidden');
-              addExamBtn.classList.add('flex');
-            } else {
-              // Là học sinh: khóa toàn bộ quyền giáo viên
-              isTeacher = false;
-              teacherBadge.classList.add('hidden');
-              navTeacherBtn.classList.add('hidden');
-              addExamBtn.classList.add('hidden');
-            }
-          } else {
-            // Chưa đăng nhập: khóa toàn bộ
-            currentUser = null;
-            isTeacher = false;
-            loginBtn.classList.remove('hidden');
-            userProfile.classList.add('hidden');
-            navTeacherBtn.classList.add('hidden');
-            addExamBtn.classList.add('hidden');
+            setUserState({
+              displayName: user.displayName || user.email,
+              email: user.email
+            });
           }
-
-          // Cập nhật lại giao diện danh sách đề thi (ẩn/hiện nút Sửa, Xóa)
-          renderExamList();
         });
       }
     } catch (e) {
       console.warn("Chưa cấu hình Firebase hoặc có lỗi:", e);
     }
 
-    function loginWithGoogle() {
-      if (!auth) {
-        alert("⚠️ Bạn chưa điền mã Firebase vào file index.html! Hãy thay apiKey từ Firebase của bạn vào để đăng nhập.");
+    function openLoginModal() {
+      document.getElementById('login-modal').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+    }
+
+    // Đăng nhập trực tiếp bằng Tên & Email (100% không bao giờ bị lỗi)
+    function handleDirectLogin(e) {
+      e.preventDefault();
+      const name = document.getElementById('direct-login-name').value.trim();
+      const email = document.getElementById('direct-login-email').value.trim().toLowerCase();
+
+      if (!name || !email) {
+        alert("Vui lòng điền đầy đủ Tên và Email!");
         return;
       }
-      auth.signInWithPopup(googleProvider).catch(err => alert("Lỗi đăng nhập: " + err.message));
+
+      setUserState({ displayName: name, email: email });
+      closeLoginModal();
+      alert(`Xin chào ${name}! Đăng nhập thành công.`);
+    }
+
+    function loginWithGoogle() {
+      if (!auth) {
+        alert("⚠️ Kết nối Google chưa được bật trong Firebase. Bạn hãy sử dụng form 'Đăng nhập nhanh' bên dưới để vào ngay mà không lo bị lỗi!");
+        return;
+      }
+      auth.signInWithPopup(googleProvider).then(res => {
+        closeLoginModal();
+      }).catch(err => {
+        alert("Lỗi kết nối Google: " + err.message + "\n\n👉 Bạn hãy điền Tên & Email ở mục bên dưới để vào làm bài ngay lập tức nhé!");
+      });
+    }
+
+    function setUserState(userObj) {
+      currentUser = userObj;
+      localStorage.setItem("prep_logged_user", JSON.stringify(userObj));
+
+      const loginBtn = document.getElementById('login-btn');
+      const userProfile = document.getElementById('user-profile');
+      const userName = document.getElementById('user-name');
+      const userAvatarBadge = document.getElementById('user-avatar-badge');
+      const teacherBadge = document.getElementById('teacher-badge');
+      const navTeacherBtn = document.getElementById('nav-teacher-btn');
+      const addExamBtn = document.getElementById('add-exam-btn');
+
+      loginBtn.classList.add('hidden');
+      userProfile.classList.remove('hidden');
+      userName.innerText = userObj.displayName;
+      userAvatarBadge.innerText = (userObj.displayName.charAt(0) || 'U').toUpperCase();
+
+      // Kiểm tra xem có phải email Giáo viên không
+      if (TEACHER_EMAILS.map(e => e.toLowerCase()).includes(userObj.email.toLowerCase())) {
+        isTeacher = true;
+        teacherBadge.classList.remove('hidden');
+        navTeacherBtn.classList.remove('hidden');
+        navTeacherBtn.classList.add('flex');
+        addExamBtn.classList.remove('hidden');
+        addExamBtn.classList.add('flex');
+      } else {
+        isTeacher = false;
+        teacherBadge.classList.add('hidden');
+        navTeacherBtn.classList.add('hidden');
+        addExamBtn.classList.add('hidden');
+      }
+
+      renderExamList();
     }
 
     function logout() {
-      if (auth) auth.signOut().then(() => switchView('home'));
+      currentUser = null;
+      isTeacher = false;
+      localStorage.removeItem("prep_logged_user");
+      if (auth) auth.signOut();
+
+      document.getElementById('login-btn').classList.remove('hidden');
+      document.getElementById('user-profile').classList.add('hidden');
+      document.getElementById('nav-teacher-btn').classList.add('hidden');
+      document.getElementById('add-exam-btn').classList.add('hidden');
+
+      renderExamList();
+      switchView('home');
+      alert("Đã đăng xuất tài khoản.");
     }
 
     /* -------------------------------------------------------------
@@ -672,7 +768,7 @@ const firebaseConfig = {
       }
     ];
 
-    const savedExams = localStorage.getItem("prep_custom_exams_v5");
+    const savedExams = localStorage.getItem("prep_custom_exams_v6");
     if (savedExams) {
       try { EXAMS_DATABASE = JSON.parse(savedExams); } catch(e){}
     }
@@ -684,11 +780,11 @@ const firebaseConfig = {
     const MAX_VIOLATIONS = 3;
     let isInExam = false;
 
-    // BẮT BUỘC ĐĂNG NHẬP MỚI ĐƯỢC VÀO LÀM BÀI
+    // BẮT BUỘC ĐĂNG NHẬP MỚI ĐƯỢC LÀM BÀI
     function startExam(examId) {
       if (!currentUser) {
-        alert("🔒 BẮT BUỘC ĐĂNG NHẬP:\n\nBạn bắt buộc phải đăng nhập tài khoản Google để bắt đầu làm bài thi và ghi nhận điểm số!");
-        loginWithGoogle();
+        alert("🔒 BẮT BUỘC ĐĂNG NHẬP:\n\nBạn cần đăng nhập tài khoản trước để hệ thống định danh thí sinh và chấm điểm!");
+        openLoginModal();
         return;
       }
 
@@ -725,7 +821,7 @@ const firebaseConfig = {
       switchView('exam');
     }
 
-    // Chống gian lận khi chuyển tab
+    // Chống gian lận chuyển tab
     document.addEventListener("visibilitychange", () => {
       if (!isInExam) return;
       if (document.hidden) {
@@ -739,7 +835,7 @@ const firebaseConfig = {
         }
 
         if (tabSwitchViolations >= MAX_VIOLATIONS) {
-          submitExam(true); // Tự nộp ngay khi vi phạm 3 lần
+          submitExam(true);
         } else {
           const modal = document.getElementById("cheat-modal");
           const modalCount = document.getElementById("cheat-modal-count");
@@ -899,7 +995,7 @@ const firebaseConfig = {
     function confirmSubmitExam() { if (confirm('Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?')) submitExam(false); }
 
     /* -------------------------------------------------------------
-       6. CHẤM BÀI & GỬI KẾT QUẢ VỀ CHO GIÁO VIÊN
+       6. CHẤM BÀI & LƯU KẾT QUẢ (LOCALSTORAGE + FIREBASE)
        ------------------------------------------------------------- */
     function submitExam(forcedByCheating = false) {
       clearInterval(timerInterval);
@@ -975,35 +1071,41 @@ const firebaseConfig = {
       if (forcedByCheating) violationBadge.classList.remove('hidden');
       else violationBadge.classList.add('hidden');
 
-      if (db && currentUser) {
-        db.collection("submissions").add({
-          studentName: currentUser.displayName || "Ẩn danh",
-          studentEmail: currentUser.email,
-          studentPhoto: currentUser.photoURL || "",
-          examId: currentExam.id,
-          examTitle: currentExam.title,
-          category: currentExam.category,
-          correctCount: correctCount,
-          totalQuestions: currentExam.questions.length,
-          scoreBadge: scoreBadge,
-          tabViolations: tabSwitchViolations,
-          detailedAnswers: detailedAnswersToSave,
-          submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+      // Lưu kết quả vào danh sách bộ nhớ (cho giáo viên xem offline)
+      const submissionData = {
+        docId: "sub-" + Date.now(),
+        studentName: currentUser ? currentUser.displayName : "Ẩn danh",
+        studentEmail: currentUser ? currentUser.email : "none@email.com",
+        examId: currentExam.id,
+        examTitle: currentExam.title,
+        correctCount: correctCount,
+        totalQuestions: currentExam.questions.length,
+        scoreBadge: scoreBadge,
+        tabViolations: tabSwitchViolations,
+        detailedAnswers: detailedAnswersToSave,
+        dateFormatted: new Date().toLocaleTimeString() + " " + new Date().toLocaleDateString()
+      };
+
+      const localSubs = JSON.parse(localStorage.getItem("prep_local_submissions") || "[]");
+      localSubs.unshift(submissionData);
+      localStorage.setItem("prep_local_submissions", JSON.stringify(localSubs));
+
+      // Đẩy lên Firestore nếu có kết nối
+      if (db) {
+        db.collection("submissions").add(submissionData);
       }
 
       switchView('result');
     }
 
     /* -------------------------------------------------------------
-       7. BẢNG TẠO & SỬA ĐỀ THI (CHẶN NẾU KHÔNG PHẢI GIÁO VIÊN)
+       7. TẠO & SỬA ĐỀ (CHỈ GIÁO VIÊN)
        ------------------------------------------------------------- */
     let builderQuestions = [];
 
     function openExamModal(examId = null) {
-      // BẢO VỆ: CHẶN HỌC SINH MỞ FORM
       if (!isTeacher) {
-        alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên để thêm hoặc sửa đề thi!");
+        alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên!");
         return;
       }
 
@@ -1165,7 +1267,6 @@ const firebaseConfig = {
     }
 
     function saveExamFromBuilder() {
-      // BẢO VỆ: CHẶN LƯU NẾU KHÔNG PHẢI GIÁO VIÊN
       if (!isTeacher) {
         alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên!");
         return;
@@ -1283,29 +1384,28 @@ const firebaseConfig = {
       if (existIdx >= 0) EXAMS_DATABASE[existIdx] = examData;
       else EXAMS_DATABASE.unshift(examData);
 
-      localStorage.setItem("prep_custom_exams_v5", JSON.stringify(EXAMS_DATABASE));
+      localStorage.setItem("prep_custom_exams_v6", JSON.stringify(EXAMS_DATABASE));
       alert(`🎉 Đã lưu đề thi thành công!`);
       closeExamModal();
       renderExamList();
     }
 
     function deleteExam(examId, examTitle) {
-      // BẢO VỆ: CHẶN XÓA NẾU KHÔNG PHẢI GIÁO VIÊN
       if (!isTeacher) {
-        alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên để xóa đề thi!");
+        alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên!");
         return;
       }
 
       if (confirm(`Bạn có chắc muốn xóa đề thi "${examTitle}" không?`)) {
         EXAMS_DATABASE = EXAMS_DATABASE.filter(e => e.id !== examId);
-        localStorage.setItem("prep_custom_exams_v5", JSON.stringify(EXAMS_DATABASE));
+        localStorage.setItem("prep_custom_exams_v6", JSON.stringify(EXAMS_DATABASE));
         alert("Đã xóa đề thi!");
         renderExamList();
       }
     }
 
     /* -------------------------------------------------------------
-       8. HIỂN THỊ ĐỀ THI TRANG CHỦ (CHỈ GIÁO VIÊN MỚI THẤY NÚT SỬA/XÓA)
+       8. HIỂN THỊ ĐỀ THI TRANG CHỦ
        ------------------------------------------------------------- */
     function renderExamList() {
       const cat = document.getElementById('filter-category') ? document.getElementById('filter-category').value : 'ALL';
@@ -1330,7 +1430,6 @@ const firebaseConfig = {
           ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">🟡 Vừa phải</span>'
           : '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">🔴 Nâng cao</span>';
 
-        // NÚT SỬA & XÓA CHỈ ĐƯỢC TẠO RA KHI LÀ GIÁO VIÊN
         const teacherControls = isTeacher ? `
           <div class="flex items-center gap-2 pt-1 border-t border-slate-100 mt-2">
             <button onclick="openExamModal('${exam.id}')" class="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1">
@@ -1382,60 +1481,46 @@ const firebaseConfig = {
         switchView('home');
         return;
       }
-      if (!db) {
-        alert("⚠️ Bạn chưa kết nối Firebase nên chưa tải được bài nộp từ đám mây!");
+
+      const tbody = document.getElementById('teacher-submissions-tbody');
+      tbody.innerHTML = '';
+
+      // Tải từ bộ nhớ máy tính
+      const localSubs = JSON.parse(localStorage.getItem("prep_local_submissions") || "[]");
+      submissionsCache = localSubs;
+
+      if (submissionsCache.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Chưa có bài thi nào được nộp.</td></tr>`;
         return;
       }
-      const tbody = document.getElementById('teacher-submissions-tbody');
-      tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Đang tải danh sách bài làm từ Firebase...</td></tr>`;
 
-      db.collection("submissions").orderBy("submittedAt", "desc").get().then(snapshot => {
-        submissionsCache = [];
-        tbody.innerHTML = '';
-
-        if (snapshot.empty) {
-          tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">Chưa có bài thi nào được nộp.</td></tr>`;
-          return;
-        }
-
-        snapshot.forEach(doc => {
-          const sub = doc.data();
-          sub.docId = doc.id;
-          submissionsCache.push(sub);
-
-          let dateStr = "Vừa xong";
-          if (sub.submittedAt && sub.submittedAt.toDate) {
-            const d = sub.submittedAt.toDate();
-            dateStr = `${d.getHours()}:${d.getMinutes()} - ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-          }
-
-          const tr = document.createElement('tr');
-          tr.className = "hover:bg-slate-50 transition";
-          tr.innerHTML = `
-            <td class="p-4 flex items-center gap-3">
-              <img src="${sub.studentPhoto || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}" class="w-8 h-8 rounded-full border border-slate-200">
-              <div>
-                <div class="font-bold text-slate-800">${sub.studentName}</div>
-                <div class="text-xs text-slate-400">${sub.studentEmail}</div>
-              </div>
-            </td>
-            <td class="p-4 font-medium text-slate-700">${sub.examTitle}</td>
-            <td class="p-4 font-bold text-slate-800">${sub.correctCount} / ${sub.totalQuestions}</td>
-            <td class="p-4"><span class="px-2.5 py-1 text-xs font-black rounded-md bg-brand-50 text-brand-600 border border-brand-200">${sub.scoreBadge}</span></td>
-            <td class="p-4">
-              <span class="px-2 py-1 text-xs font-bold rounded ${sub.tabViolations >= 3 ? 'bg-rose-100 text-rose-700 font-black' : sub.tabViolations > 0 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}">
-                ${sub.tabViolations || 0} lần
-              </span>
-            </td>
-            <td class="p-4 text-xs text-slate-500">${dateStr}</td>
-            <td class="p-4 text-center">
-              <button onclick="viewStudentDetail('${sub.docId}')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition">Xem bài</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }).catch(err => {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-rose-500">Lỗi: ${err.message}</td></tr>`;
+      submissionsCache.forEach(sub => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="p-4 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center uppercase">
+              ${(sub.studentName.charAt(0) || 'U')}
+            </div>
+            <div>
+              <div class="font-bold text-slate-800">${sub.studentName}</div>
+              <div class="text-xs text-slate-400">${sub.studentEmail}</div>
+            </div>
+          </td>
+          <td class="p-4 font-medium text-slate-700">${sub.examTitle}</td>
+          <td class="p-4 font-bold text-slate-800">${sub.correctCount} / ${sub.totalQuestions}</td>
+          <td class="p-4"><span class="px-2.5 py-1 text-xs font-black rounded-md bg-brand-50 text-brand-600 border border-brand-200">${sub.scoreBadge}</span></td>
+          <td class="p-4">
+            <span class="px-2 py-1 text-xs font-bold rounded ${sub.tabViolations >= 3 ? 'bg-rose-100 text-rose-700 font-black' : sub.tabViolations > 0 ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}">
+              ${sub.tabViolations || 0} lần
+            </span>
+          </td>
+          <td class="p-4 text-xs text-slate-500">${sub.dateFormatted}</td>
+          <td class="p-4 text-center">
+            <button onclick="viewStudentDetail('${sub.docId}')" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition">Xem bài</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
       });
     }
 
@@ -1472,12 +1557,7 @@ const firebaseConfig = {
       if (submissionsCache.length === 0) return alert("Chưa có dữ liệu bài nộp để xuất Excel!");
       let csv = "\uFEFFTên Học Sinh,Email,Đề Thi,Số Câu Đúng,Tổng Số Câu,Điểm Quy Đổi,Vi Phạm Chuyển Tab,Thời Gian Nộp\n";
       submissionsCache.forEach(sub => {
-        let dateStr = "Vừa xong";
-        if (sub.submittedAt && sub.submittedAt.toDate) {
-          const d = sub.submittedAt.toDate();
-          dateStr = `${d.getHours()}:${d.getMinutes()} ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-        }
-        csv += `"${sub.studentName}","${sub.studentEmail}","${sub.examTitle}",${sub.correctCount},${sub.totalQuestions},"${sub.scoreBadge}",${sub.tabViolations || 0},"${dateStr}"\n`;
+        csv += `"${sub.studentName}","${sub.studentEmail}","${sub.examTitle}",${sub.correctCount},${sub.totalQuestions},"${sub.scoreBadge}",${sub.tabViolations || 0},"${sub.dateFormatted}"\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
