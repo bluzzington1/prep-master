@@ -40,7 +40,7 @@
 </head>
 <body id="app-body" class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans relative">
 
-  <!-- CANVAS HIỆU ỨNG LỄ HỘI (AN TOÀN TUYỆT ĐỐI, KHÔNG CHẶN CHUỘT) -->
+  <!-- CANVAS LỄ HỘI -->
   <canvas id="holiday-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 40;"></canvas>
 
   <!-- BANNER LỄ HỘI -->
@@ -61,17 +61,18 @@
 
       <nav class="flex items-center space-x-2">
         <button onclick="switchView('home')" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Thư Viện Đề</button>
-        <button onclick="switchView('teacher')" class="px-3.5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition flex items-center gap-1.5 border border-indigo-200">
+        
+        <!-- NÚT NÀY CHỈ GIÁO VIÊN MỚI THẤY (MẶC ĐỊNH ẨN) -->
+        <button id="nav-teacher-btn" onclick="switchView('teacher')" class="hidden px-3.5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition items-center gap-1.5 border border-indigo-200">
           <i class="ph-bold ph-chalkboard-teacher text-lg"></i> Quản Lý Bài Nộp
         </button>
 
-        <!-- CHỌN GIAO DIỆN LỄ TẾT VIỆT NAM -->
         <select id="theme-selector" onchange="changeHolidayTheme(this.value)" class="text-xs font-bold bg-amber-50 border border-amber-300 text-amber-900 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer hover:bg-amber-100 transition shadow-sm">
           <option value="default">🎨 Giao diện: Mặc định</option>
-          <option value="tet">🌸 Tết Nguyên Đán (Hoa Mai/Đào)</option>
+          <option value="tet">🌸 Tết Nguyên Đán</option>
           <option value="national">🇻🇳 Quốc Khánh 2/9 & 30/4</option>
           <option value="teachers_day">💐 Ngày Nhà Giáo VN 20/11</option>
-          <option value="mid_autumn">🏮 Tết Trung Thu (Đèn Lồng)</option>
+          <option value="mid_autumn">🏮 Tết Trung Thu</option>
         </select>
       </nav>
 
@@ -83,8 +84,8 @@
         <div id="user-profile" class="hidden flex items-center gap-3">
           <div class="flex items-center gap-2 border border-slate-200 py-1.5 px-3 rounded-full bg-slate-50">
             <img id="user-avatar" src="" class="w-7 h-7 rounded-full" alt="Avatar">
-            <span id="user-name" class="text-xs font-semibold text-slate-700 max-w-[110px] truncate">Học sinh</span>
-            <span id="teacher-badge" class="hidden px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black uppercase">GV</span>
+            <span id="user-name" class="text-xs font-semibold text-slate-700 max-w-[110px] truncate">Người dùng</span>
+            <span id="teacher-badge" class="hidden px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black uppercase">GIÁO VIÊN</span>
           </div>
           <button onclick="logout()" title="Đăng xuất" class="text-slate-400 hover:text-rose-600 text-lg transition p-1">
             <i class="ph ph-sign-out"></i>
@@ -102,10 +103,11 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Thư Viện Đề Thi Trực Tuyến</h1>
-          <p class="text-slate-500 mt-1 text-sm">Hỗ trợ đầy đủ các dạng bài và hệ thống cảnh báo chống gian lận khi chuyển tab.</p>
+          <p class="text-slate-500 mt-1 text-sm">Học sinh bắt buộc đăng nhập tài khoản để làm bài thi và ghi nhận kết quả.</p>
         </div>
         
-        <button onclick="openExamModal()" class="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm flex items-center gap-2 transition shadow-lg shadow-indigo-600/30 shrink-0">
+        <!-- NÚT TẠO ĐỀ NÀY CHỈ DUY NHẤT GIÁO VIÊN MỚI THẤY (MẶC ĐỊNH ẨN) -->
+        <button id="add-exam-btn" onclick="openExamModal()" class="hidden px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm items-center gap-2 transition shadow-lg shadow-indigo-600/30 shrink-0">
           <i class="ph-bold ph-plus-circle text-xl"></i> ➕ Tạo Đề Thi Mới
         </button>
       </div>
@@ -239,7 +241,7 @@
       </div>
     </section>
 
-    <!-- 4. VIEW QUẢN LÝ BÀI NỘP CỦA GIÁO VIÊN -->
+    <!-- 4. VIEW QUẢN LÝ BÀI NỘP (CHỈ GIÁO VIÊN MỚI ĐƯỢC VÀO) -->
     <section id="view-teacher" class="hidden py-8 px-4 max-w-7xl mx-auto w-full">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
@@ -278,9 +280,9 @@
       </div>
     </section>
 
-    <!-- HỘP THOẠI CẢNH BÁO VI PHẠM GIAN LẬN (THAY THẾ ALERT ĐỂ KHÔNG BỊ TREO MÁY) -->
+    <!-- HỘP THOẠI CẢNH BÁO VI PHẠM GIAN LẬN -->
     <div id="cheat-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border-2 border-rose-500 animate-bounce">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border-2 border-rose-500">
         <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
           <i class="ph-bold ph-warning-octagon"></i>
         </div>
@@ -290,7 +292,7 @@
           <span id="cheat-modal-count" class="font-black text-rose-600 text-base">1</span>/3 lần!
         </p>
         <p class="text-xs text-slate-400 mb-6 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-          ⚠️ <strong>Quy định:</strong> Nếu chuyển tab hoặc rời ứng dụng đủ 3 lần, bài thi sẽ bị <strong>TỰ ĐỘNG KHÓA VÀ NỘP NGAY LẬP TỨC</strong>.
+          ⚠️ <strong>Quy định:</strong> Rời khỏi trang làm bài đủ 3 lần, bài thi sẽ bị <strong>TỰ ĐỘNG KHÓA VÀ NỘP NGAY LẬP TỨC</strong>.
         </p>
         <button onclick="dismissCheatWarning()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition shadow-md">
           Tôi đã hiểu và cam kết quay lại làm bài
@@ -314,14 +316,14 @@
       </div>
     </div>
 
-    <!-- ================= MODAL TẠO & CHỈNH SỬA ĐỀ THI ================= -->
+    <!-- MODAL TẠO & CHỈNH SỬA ĐỀ THI (CHỈ GIÁO VIÊN MỞ ĐƯỢC) -->
     <div id="exam-builder-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         
         <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
           <div>
             <h3 id="builder-modal-title" class="font-bold text-slate-800 text-lg">➕ Thêm Đề Thi Mới</h3>
-            <p class="text-xs text-slate-500">Hỗ trợ đầy đủ độ khó Dễ/Vừa/Khó và nhiều dạng bài tập phong phú.</p>
+            <p class="text-xs text-slate-500">Khu vực dành riêng cho Giáo viên tạo và chỉnh sửa đề.</p>
           </div>
           <button onclick="closeExamModal()" class="text-slate-400 hover:text-slate-600 p-1 text-xl">
             <i class="ph ph-x"></i>
@@ -331,7 +333,6 @@
         <div class="p-6 overflow-y-auto flex-1 space-y-5">
           <input type="hidden" id="builder-exam-id">
 
-          <!-- THỜI GIAN VÀ ĐỘ KHÓ -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tên đề thi *</label>
@@ -363,13 +364,11 @@
             </div>
           </div>
 
-          <!-- Đoạn văn bài đọc -->
           <div>
             <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nội dung bài đọc / Ngữ liệu (Passage) *</label>
             <textarea id="builder-exam-passage" rows="6" placeholder="Dán bài đọc IELTS, đoạn văn HSG vào đây..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
           </div>
 
-          <!-- Danh sách câu hỏi -->
           <div class="pt-4 border-t border-slate-200">
             <div class="flex items-center justify-between mb-3">
               <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
@@ -399,7 +398,7 @@
   <!-- ================= JAVASCRIPT SYSTEM ================= -->
   <script>
     /* -------------------------------------------------------------
-       1. CẤU HÌNH THEME LỄ HỘI VIỆT NAM (KHÔNG BAO GIỜ CHẶN CHUỘT)
+       1. CẤU HÌNH THEME LỄ HỘI VIỆT NAM
        ------------------------------------------------------------- */
     let animationId = null;
     let particles = [];
@@ -518,7 +517,7 @@
     });
 
     /* -------------------------------------------------------------
-       2. CẤU HÌNH FIREBASE
+       2. CẤU HÌNH FIREBASE & PHÂN QUYỀN GIÁO VIÊN BẢO MẬT
        ------------------------------------------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyBQPADW2JL48w28yJcYVViUXmifs7aRi3Y",
@@ -529,19 +528,19 @@ const firebaseConfig = {
   appId: "1:247432664150:web:20a46d338618746ebbd7f7",
   measurementId: "G-Z660E52LLW"
 };
-
+    // 👉 ĐIỀN ĐỊA CHỈ GMAIL GIÁO VIÊN VÀO ĐÂY:
     const TEACHER_EMAILS = [
-      "bluzzington1@gmail.com"
+      "bluzzington1@gmail."
     ];
 
     let auth = null;
     let db = null;
     let googleProvider = null;
     let currentUser = null;
-    let isTeacher = false;
+    let isTeacher = false; // Mặc định là KHÔNG PHẢI GIÁO VIÊN
 
     try {
-      if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("AIzaSyBQPADW2JL48w28yJcYVViUXmifs7aRi3Y")) {
+      if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("THAY_API_KEY")) {
         firebase.initializeApp(firebaseConfig);
         auth = firebase.auth();
         db = firebase.firestore();
@@ -552,6 +551,8 @@ const firebaseConfig = {
           const loginBtn = document.getElementById('login-btn');
           const userProfile = document.getElementById('user-profile');
           const teacherBadge = document.getElementById('teacher-badge');
+          const navTeacherBtn = document.getElementById('nav-teacher-btn');
+          const addExamBtn = document.getElementById('add-exam-btn');
 
           if (user) {
             loginBtn.classList.add('hidden');
@@ -559,18 +560,33 @@ const firebaseConfig = {
             document.getElementById('user-avatar').src = user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user';
             document.getElementById('user-name').innerText = user.displayName || user.email;
 
-            if (TEACHER_EMAILS.includes(user.email.toLowerCase())) {
+            // KIỂM TRA ĐỊA CHỈ EMAIL CÓ PHẢI GIÁO VIÊN HAY KHÔNG
+            if (TEACHER_EMAILS.map(e => e.toLowerCase()).includes(user.email.toLowerCase())) {
               isTeacher = true;
               teacherBadge.classList.remove('hidden');
+              navTeacherBtn.classList.remove('hidden');
+              navTeacherBtn.classList.add('flex');
+              addExamBtn.classList.remove('hidden');
+              addExamBtn.classList.add('flex');
             } else {
+              // Là học sinh: khóa toàn bộ quyền giáo viên
               isTeacher = false;
               teacherBadge.classList.add('hidden');
+              navTeacherBtn.classList.add('hidden');
+              addExamBtn.classList.add('hidden');
             }
           } else {
+            // Chưa đăng nhập: khóa toàn bộ
+            currentUser = null;
+            isTeacher = false;
             loginBtn.classList.remove('hidden');
             userProfile.classList.add('hidden');
-            isTeacher = false;
+            navTeacherBtn.classList.add('hidden');
+            addExamBtn.classList.add('hidden');
           }
+
+          // Cập nhật lại giao diện danh sách đề thi (ẩn/hiện nút Sửa, Xóa)
+          renderExamList();
         });
       }
     } catch (e) {
@@ -590,7 +606,7 @@ const firebaseConfig = {
     }
 
     /* -------------------------------------------------------------
-       3. DỮ LIỆU ĐỀ THI MẪU (ĐỦ MỨC ĐỘ DỄ/VỪA/KHÓ)
+       3. DỮ LIỆU ĐỀ THI MẪU
        ------------------------------------------------------------- */
     let EXAMS_DATABASE = [
       {
@@ -656,63 +672,26 @@ const firebaseConfig = {
       }
     ];
 
-    const savedExams = localStorage.getItem("prep_custom_exams_v4");
+    const savedExams = localStorage.getItem("prep_custom_exams_v5");
     if (savedExams) {
       try { EXAMS_DATABASE = JSON.parse(savedExams); } catch(e){}
     }
 
     /* -------------------------------------------------------------
-       4. CHỐNG GIAN LẬN: SỬ DỤNG MODAL TRONG TRANG (KHÔNG DÙNG ALERT)
+       4. BẮT BUỘC ĐĂNG NHẬP ĐỂ LÀM BÀI & CHỐNG GIAN LẬN
        ------------------------------------------------------------- */
     let tabSwitchViolations = 0;
     const MAX_VIOLATIONS = 3;
     let isInExam = false;
 
-    // Chỉ dùng document.visibilitychange để chống gian lận chính xác nhất
-    document.addEventListener("visibilitychange", () => {
-      if (!isInExam) return;
-      if (document.hidden) {
-        tabSwitchViolations++;
-
-        // Cập nhật banner cảnh báo
-        const warningBar = document.getElementById("cheat-warning-bar");
-        const countText = document.getElementById("violation-count-text");
-        if (warningBar && countText) {
-          countText.innerText = tabSwitchViolations;
-          warningBar.classList.remove("hidden");
-        }
-
-        if (tabSwitchViolations >= MAX_VIOLATIONS) {
-          // Tự động nộp bài ngay lập tức khi đủ 3 lần
-          submitExam(true);
-        } else {
-          // Hiện modal cảnh báo trong trang
-          const modal = document.getElementById("cheat-modal");
-          const modalCount = document.getElementById("cheat-modal-count");
-          if (modal && modalCount) {
-            modalCount.innerText = tabSwitchViolations;
-            modal.classList.remove("hidden");
-          }
-        }
-      }
-    });
-
-    function dismissCheatWarning() {
-      const modal = document.getElementById("cheat-modal");
-      if (modal) modal.classList.add("hidden");
-    }
-
-    /* -------------------------------------------------------------
-       5. PHÒNG THI & HIỂN THỊ CÂU HỎI
-       ------------------------------------------------------------- */
-    let currentExam = null;
-    let currentQuestionIdx = 0;
-    let userAnswers = {};
-    let flaggedQuestions = new Set();
-    let timerInterval = null;
-    let secondsRemaining = 0;
-
+    // BẮT BUỘC ĐĂNG NHẬP MỚI ĐƯỢC VÀO LÀM BÀI
     function startExam(examId) {
+      if (!currentUser) {
+        alert("🔒 BẮT BUỘC ĐĂNG NHẬP:\n\nBạn bắt buộc phải đăng nhập tài khoản Google để bắt đầu làm bài thi và ghi nhận điểm số!");
+        loginWithGoogle();
+        return;
+      }
+
       currentExam = EXAMS_DATABASE.find(e => e.id === examId);
       currentQuestionIdx = 0;
       userAnswers = {};
@@ -745,6 +724,47 @@ const firebaseConfig = {
       renderCurrentQuestion();
       switchView('exam');
     }
+
+    // Chống gian lận khi chuyển tab
+    document.addEventListener("visibilitychange", () => {
+      if (!isInExam) return;
+      if (document.hidden) {
+        tabSwitchViolations++;
+
+        const warningBar = document.getElementById("cheat-warning-bar");
+        const countText = document.getElementById("violation-count-text");
+        if (warningBar && countText) {
+          countText.innerText = tabSwitchViolations;
+          warningBar.classList.remove("hidden");
+        }
+
+        if (tabSwitchViolations >= MAX_VIOLATIONS) {
+          submitExam(true); // Tự nộp ngay khi vi phạm 3 lần
+        } else {
+          const modal = document.getElementById("cheat-modal");
+          const modalCount = document.getElementById("cheat-modal-count");
+          if (modal && modalCount) {
+            modalCount.innerText = tabSwitchViolations;
+            modal.classList.remove("hidden");
+          }
+        }
+      }
+    });
+
+    function dismissCheatWarning() {
+      const modal = document.getElementById("cheat-modal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    /* -------------------------------------------------------------
+       5. PHÒNG THI & HIỂN THỊ CÂU HỎI
+       ------------------------------------------------------------- */
+    let currentExam = null;
+    let currentQuestionIdx = 0;
+    let userAnswers = {};
+    let flaggedQuestions = new Set();
+    let timerInterval = null;
+    let secondsRemaining = 0;
 
     function updateTimerDisplay() {
       const mins = Math.floor(secondsRemaining / 60);
@@ -879,7 +899,7 @@ const firebaseConfig = {
     function confirmSubmitExam() { if (confirm('Bạn có chắc chắn muốn nộp bài thi ngay bây giờ?')) submitExam(false); }
 
     /* -------------------------------------------------------------
-       6. CHẤM BÀI & GHI NHẬN VI PHẠM
+       6. CHẤM BÀI & GỬI KẾT QUẢ VỀ CHO GIÁO VIÊN
        ------------------------------------------------------------- */
     function submitExam(forcedByCheating = false) {
       clearInterval(timerInterval);
@@ -976,11 +996,17 @@ const firebaseConfig = {
     }
 
     /* -------------------------------------------------------------
-       7. BẢNG TẠO & SỬA ĐỀ THI
+       7. BẢNG TẠO & SỬA ĐỀ THI (CHẶN NẾU KHÔNG PHẢI GIÁO VIÊN)
        ------------------------------------------------------------- */
     let builderQuestions = [];
 
     function openExamModal(examId = null) {
+      // BẢO VỆ: CHẶN HỌC SINH MỞ FORM
+      if (!isTeacher) {
+        alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên để thêm hoặc sửa đề thi!");
+        return;
+      }
+
       builderQuestions = [];
       const list = document.getElementById('builder-questions-list');
       list.innerHTML = '';
@@ -1139,6 +1165,12 @@ const firebaseConfig = {
     }
 
     function saveExamFromBuilder() {
+      // BẢO VỆ: CHẶN LƯU NẾU KHÔNG PHẢI GIÁO VIÊN
+      if (!isTeacher) {
+        alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên!");
+        return;
+      }
+
       const examId = document.getElementById('builder-exam-id').value || ("exam-" + Date.now());
       const title = document.getElementById('builder-exam-title').value.trim();
       const category = document.getElementById('builder-exam-category').value;
@@ -1251,23 +1283,29 @@ const firebaseConfig = {
       if (existIdx >= 0) EXAMS_DATABASE[existIdx] = examData;
       else EXAMS_DATABASE.unshift(examData);
 
-      localStorage.setItem("prep_custom_exams_v4", JSON.stringify(EXAMS_DATABASE));
+      localStorage.setItem("prep_custom_exams_v5", JSON.stringify(EXAMS_DATABASE));
       alert(`🎉 Đã lưu đề thi thành công!`);
       closeExamModal();
       renderExamList();
     }
 
     function deleteExam(examId, examTitle) {
+      // BẢO VỆ: CHẶN XÓA NẾU KHÔNG PHẢI GIÁO VIÊN
+      if (!isTeacher) {
+        alert("⛔ BẢO MẬT: Bạn không có quyền Giáo viên để xóa đề thi!");
+        return;
+      }
+
       if (confirm(`Bạn có chắc muốn xóa đề thi "${examTitle}" không?`)) {
         EXAMS_DATABASE = EXAMS_DATABASE.filter(e => e.id !== examId);
-        localStorage.setItem("prep_custom_exams_v4", JSON.stringify(EXAMS_DATABASE));
+        localStorage.setItem("prep_custom_exams_v5", JSON.stringify(EXAMS_DATABASE));
         alert("Đã xóa đề thi!");
         renderExamList();
       }
     }
 
     /* -------------------------------------------------------------
-       8. HIỂN THỊ ĐỀ THI TRANG CHỦ & PHÂN LOẠI MÀU ĐỘ KHÓ
+       8. HIỂN THỊ ĐỀ THI TRANG CHỦ (CHỈ GIÁO VIÊN MỚI THẤY NÚT SỬA/XÓA)
        ------------------------------------------------------------- */
     function renderExamList() {
       const cat = document.getElementById('filter-category') ? document.getElementById('filter-category').value : 'ALL';
@@ -1292,6 +1330,18 @@ const firebaseConfig = {
           ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">🟡 Vừa phải</span>'
           : '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">🔴 Nâng cao</span>';
 
+        // NÚT SỬA & XÓA CHỈ ĐƯỢC TẠO RA KHI LÀ GIÁO VIÊN
+        const teacherControls = isTeacher ? `
+          <div class="flex items-center gap-2 pt-1 border-t border-slate-100 mt-2">
+            <button onclick="openExamModal('${exam.id}')" class="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1">
+              <i class="ph-bold ph-pencil-simple"></i> Sửa đề
+            </button>
+            <button onclick="deleteExam('${exam.id}', '${exam.title}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1">
+              <i class="ph-bold ph-trash"></i> Xóa
+            </button>
+          </div>
+        ` : '';
+
         card.innerHTML = `
           <div>
             <div class="flex items-center justify-between mb-3">
@@ -1314,14 +1364,7 @@ const firebaseConfig = {
             <button onclick="startExam('${exam.id}')" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
               Bắt đầu làm bài <i class="ph ph-caret-right"></i>
             </button>
-            <div class="flex items-center gap-2 pt-1">
-              <button onclick="openExamModal('${exam.id}')" class="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1">
-                <i class="ph-bold ph-pencil-simple"></i> Sửa đề
-              </button>
-              <button onclick="deleteExam('${exam.id}', '${exam.title}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-lg text-xs transition flex items-center justify-center gap-1">
-                <i class="ph-bold ph-trash"></i> Xóa
-              </button>
-            </div>
+            ${teacherControls}
           </div>
         `;
         container.appendChild(card);
@@ -1334,6 +1377,11 @@ const firebaseConfig = {
     let submissionsCache = [];
 
     function loadTeacherSubmissions() {
+      if (!isTeacher) {
+        alert("⛔ BẢO MẬT: Bạn không có quyền truy cập trang này!");
+        switchView('home');
+        return;
+      }
       if (!db) {
         alert("⚠️ Bạn chưa kết nối Firebase nên chưa tải được bài nộp từ đám mây!");
         return;
@@ -1420,6 +1468,7 @@ const firebaseConfig = {
     }
 
     function exportToCSV() {
+      if (!isTeacher) return alert("⛔ Chỉ Giáo viên mới có quyền xuất file điểm!");
       if (submissionsCache.length === 0) return alert("Chưa có dữ liệu bài nộp để xuất Excel!");
       let csv = "\uFEFFTên Học Sinh,Email,Đề Thi,Số Câu Đúng,Tổng Số Câu,Điểm Quy Đổi,Vi Phạm Chuyển Tab,Thời Gian Nộp\n";
       submissionsCache.forEach(sub => {
@@ -1439,6 +1488,11 @@ const firebaseConfig = {
     }
 
     function switchView(viewName) {
+      if (viewName === 'teacher' && !isTeacher) {
+        alert("⛔ BẢO MẬT: Khu vực này chỉ dành cho tài khoản Giáo viên!");
+        return;
+      }
+
       document.getElementById('view-home').classList.add('hidden');
       document.getElementById('view-exam').classList.add('hidden');
       document.getElementById('view-result').classList.add('hidden');
@@ -1460,7 +1514,6 @@ const firebaseConfig = {
       renderExamList();
     }
 
-    // Khởi động Theme lễ hội và nạp danh sách đề thi
     const savedTheme = localStorage.getItem("prep_holiday_theme") || "default";
     applyTheme(savedTheme);
     renderExamList();
