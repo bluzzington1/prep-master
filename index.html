@@ -36,33 +36,22 @@
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #f1f5f9; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-
-    /* Canvas trang trí hiệu ứng rơi */
-    #holiday-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 9999;
-    }
   </style>
 </head>
-<body id="app-body" class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans relative transition-colors duration-500">
+<body id="app-body" class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans relative">
 
-  <!-- Canvas hiệu ứng lễ hội -->
-  <canvas id="holiday-canvas"></canvas>
+  <!-- CANVAS HIỆU ỨNG LỄ HỘI (AN TOÀN TUYỆT ĐỐI, KHÔNG CHẶN CHUỘT) -->
+  <canvas id="holiday-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 40;"></canvas>
 
-  <!-- BANNER LỄ HỘI (HIỆN KHI BẬT THEME) -->
-  <div id="holiday-banner" class="hidden text-center py-2 px-4 text-xs font-bold text-white transition-all shadow-sm"></div>
+  <!-- BANNER LỄ HỘI -->
+  <div id="holiday-banner" class="hidden text-center py-2 px-4 text-xs font-black text-white tracking-wider shadow-sm z-30 relative"></div>
 
   <!-- ================= HEADER ================= -->
-  <header class="bg-white/95 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
+  <header class="bg-white/95 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
-        <div id="app-logo-box" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
-          <i id="app-logo-icon" class="ph-bold ph-graduation-cap"></i>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+          <i class="ph-bold ph-graduation-cap"></i>
         </div>
         <div>
           <span class="text-xl font-black bg-gradient-to-r from-brand-600 to-indigo-600 bg-clip-text text-transparent">PrepMaster</span>
@@ -71,21 +60,19 @@
       </div>
 
       <nav class="flex items-center space-x-2">
-        <button onclick="switchView('home')" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Thư Viện Đề</button>
-        <button onclick="switchView('teacher')" class="px-3 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition flex items-center gap-1.5 border border-indigo-200">
+        <button onclick="switchView('home')" class="px-3.5 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Thư Viện Đề</button>
+        <button onclick="switchView('teacher')" class="px-3.5 py-2 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition flex items-center gap-1.5 border border-indigo-200">
           <i class="ph-bold ph-chalkboard-teacher text-lg"></i> Quản Lý Bài Nộp
         </button>
 
-        <!-- NÚT CHỌN THEME TRANG TRÍ LỄ TẾT VIỆT NAM -->
-        <div class="relative inline-block text-left">
-          <select id="theme-selector" onchange="changeHolidayTheme(this.value)" class="text-xs font-bold bg-amber-50 border border-amber-300 text-amber-900 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer hover:bg-amber-100 transition shadow-sm">
-            <option value="default">🎨 Giao diện: Mặc định</option>
-            <option value="tet">🌸 Tết Nguyên Đán (Hoa Mai/Đào)</option>
-            <option value="national">🇻🇳 Quốc Khánh 2/9 & 30/4 (Cờ Đỏ)</option>
-            <option value="teachers_day">💐 Ngày Nhà Giáo VN 20/11</option>
-            <option value="mid_autumn">🏮 Tết Trung Thu (Đèn Lồng)</option>
-          </select>
-        </div>
+        <!-- CHỌN GIAO DIỆN LỄ TẾT VIỆT NAM -->
+        <select id="theme-selector" onchange="changeHolidayTheme(this.value)" class="text-xs font-bold bg-amber-50 border border-amber-300 text-amber-900 rounded-lg px-2.5 py-1.5 outline-none cursor-pointer hover:bg-amber-100 transition shadow-sm">
+          <option value="default">🎨 Giao diện: Mặc định</option>
+          <option value="tet">🌸 Tết Nguyên Đán (Hoa Mai/Đào)</option>
+          <option value="national">🇻🇳 Quốc Khánh 2/9 & 30/4</option>
+          <option value="teachers_day">💐 Ngày Nhà Giáo VN 20/11</option>
+          <option value="mid_autumn">🏮 Tết Trung Thu (Đèn Lồng)</option>
+        </select>
       </nav>
 
       <div id="auth-container" class="flex items-center gap-3">
@@ -107,7 +94,7 @@
     </div>
   </header>
 
-  <!-- ================= MAIN ================= -->
+  <!-- ================= MAIN CONTAINER ================= -->
   <main class="flex-1 flex flex-col">
 
     <!-- 1. HOME VIEW -->
@@ -123,7 +110,7 @@
         </button>
       </div>
 
-      <!-- Bộ lọc (Có đầy đủ 3 mức độ Dễ - Vừa - Nâng cao) -->
+      <!-- Bộ lọc -->
       <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-8 grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div>
           <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Kỳ thi</label>
@@ -164,10 +151,10 @@
     <!-- 2. EXAM WORKSPACE (PHÒNG THI) -->
     <section id="view-exam" class="hidden flex-1 flex flex-col h-[calc(100vh-64px)] bg-slate-100 overflow-hidden relative">
       
-      <!-- BANNER CẢNH BÁO GIAN LẬN NẰM TRÊN CÙNG -->
-      <div id="cheat-warning-bar" class="hidden bg-rose-600 text-white px-4 py-2 text-xs font-black flex items-center justify-between animate-pulse">
-        <span class="flex items-center gap-1.5">
-          <i class="ph-bold ph-warning-octagon text-base"></i> PHÁT HIỆN RỜI TAB! Bạn đã vi phạm <span id="violation-count-text">0</span>/3 lần. Vi phạm lần 3 bài sẽ tự động nộp!
+      <!-- BANNER CẢNH BÁO VI PHẠM RỜI TAB -->
+      <div id="cheat-warning-bar" class="hidden bg-rose-600 text-white px-4 py-2 text-xs font-bold flex items-center justify-between shrink-0">
+        <span class="flex items-center gap-2">
+          <i class="ph-bold ph-warning-octagon text-base text-yellow-300"></i> PHÁT HIỆN RỜI TAB! Đã vi phạm <span id="violation-count-text" class="underline font-black text-sm">0</span>/3 lần. Đủ 3 lần bài sẽ tự động nộp ngay!
         </span>
       </div>
 
@@ -223,7 +210,7 @@
           <span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-600 font-bold text-xs uppercase tracking-wider rounded-full mb-2">Đã Hoàn Thành</span>
           <h2 id="result-exam-title" class="text-2xl font-black text-slate-800">Kết Quả Bài Làm</h2>
           <div id="result-violation-badge" class="hidden mt-2 inline-block px-3 py-1 bg-rose-100 text-rose-700 font-bold text-xs rounded-full">
-            ⚠️ Bị nộp tự động do chuyển tab quá 3 lần!
+            🚨 Bị tự động nộp bài do rời màn hình quá 3 lần!
           </div>
         </div>
         <div class="grid grid-cols-3 gap-4 my-6">
@@ -291,6 +278,26 @@
       </div>
     </section>
 
+    <!-- HỘP THOẠI CẢNH BÁO VI PHẠM GIAN LẬN (THAY THẾ ALERT ĐỂ KHÔNG BỊ TREO MÁY) -->
+    <div id="cheat-modal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border-2 border-rose-500 animate-bounce">
+        <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+          <i class="ph-bold ph-warning-octagon"></i>
+        </div>
+        <h3 class="text-xl font-black text-rose-600 mb-2">CẢNH BÁO RỜI PHÒNG THI!</h3>
+        <p class="text-slate-600 text-sm mb-4">
+          Hệ thống phát hiện bạn vừa rời khỏi màn hình làm bài thi. Bạn đã vi phạm 
+          <span id="cheat-modal-count" class="font-black text-rose-600 text-base">1</span>/3 lần!
+        </p>
+        <p class="text-xs text-slate-400 mb-6 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+          ⚠️ <strong>Quy định:</strong> Nếu chuyển tab hoặc rời ứng dụng đủ 3 lần, bài thi sẽ bị <strong>TỰ ĐỘNG KHÓA VÀ NỘP NGAY LẬP TỨC</strong>.
+        </p>
+        <button onclick="dismissCheatWarning()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-sm transition shadow-md">
+          Tôi đã hiểu và cam kết quay lại làm bài
+        </button>
+      </div>
+    </div>
+
     <!-- MODAL XEM CHI TIẾT BÀI HỌC SINH -->
     <div id="teacher-detail-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
@@ -324,7 +331,7 @@
         <div class="p-6 overflow-y-auto flex-1 space-y-5">
           <input type="hidden" id="builder-exam-id">
 
-          <!-- THÔNG TIN VÀ ĐỘ KHÓ ĐẦY ĐỦ DỄ - VỪA - KHÓ -->
+          <!-- THỜI GIAN VÀ ĐỘ KHÓ -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Tên đề thi *</label>
@@ -392,41 +399,32 @@
   <!-- ================= JAVASCRIPT SYSTEM ================= -->
   <script>
     /* -------------------------------------------------------------
-       1. CẤU HÌNH THEME TRANG TRÍ CÁC NGÀY LỄ LỚN CỦA VIỆT NAM
+       1. CẤU HÌNH THEME LỄ HỘI VIỆT NAM (KHÔNG BAO GIỜ CHẶN CHUỘT)
        ------------------------------------------------------------- */
     let animationId = null;
     let particles = [];
 
     const HOLIDAY_THEMES = {
-      default: {
-        bannerText: "",
-        bgClass: "bg-slate-50",
-        bannerBg: "",
-        particleType: null
-      },
+      default: { bannerText: "", bannerBg: "", particleType: null },
       tet: {
         bannerText: "🌸 CHÚC MỪNG NĂM MỚI - TẾT NGUYÊN ĐÁN AN KHANG THỊNH VƯỢNG 🌸",
-        bgClass: "bg-amber-50/40",
         bannerBg: "bg-gradient-to-r from-red-600 via-amber-600 to-red-600",
-        particleType: "petals" // Hoa đào, hoa mai rơi
+        particleType: "petals"
       },
       national: {
-        bannerText: "🇻🇳 NHIỆT LIỆT CHÀO MỪNG KỶ NIỆM NGÀY QUỐC KHÁNH 2/9 & GIẢI PHÓNG MIỀN NAM 30/4 🇻🇳",
-        bgClass: "bg-red-50/30",
+        bannerText: "🇻🇳 NHIỆT LIỆT CHÀO MỪNG NGÀY QUỐC KHÁNH 2/9 & GIẢI PHÓNG MIỀN NAM 30/4 🇻🇳",
         bannerBg: "bg-gradient-to-r from-red-700 via-red-600 to-red-700",
-        particleType: "stars" // Ngôi sao vàng rơi
+        particleType: "stars"
       },
       teachers_day: {
         bannerText: "💐 CHÀO MỪNG NGÀY NHÀ GIÁO VIỆT NAM 20/11 - TÔN SƯ TRỌNG ĐẠO 💐",
-        bgClass: "bg-emerald-50/30",
         bannerBg: "bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-600",
-        particleType: "flowers" // Cánh hoa bay
+        particleType: "flowers"
       },
       mid_autumn: {
         bannerText: "🏮 VUI TẾT TRUNG THU - ĐÊM HỘI TRĂNG RẰM THÁNG 8 🏮",
-        bgClass: "bg-indigo-950/5",
         bannerBg: "bg-gradient-to-r from-amber-600 via-yellow-600 to-amber-600",
-        particleType: "lanterns" // Đèn lồng / ánh trăng
+        particleType: "lanterns"
       }
     };
 
@@ -451,9 +449,9 @@
       initParticles(theme.particleType);
     }
 
-    // Hiệu ứng rơi cho các ngày lễ (Hoa mai, sao vàng, đèn lồng)
     function initParticles(type) {
       const canvas = document.getElementById("holiday-canvas");
+      if (!canvas) return;
       const ctx = canvas.getContext("2d");
       cancelAnimationFrame(animationId);
 
@@ -464,9 +462,8 @@
 
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-
       particles = [];
-      const count = type === "petals" ? 35 : 25;
+      const count = type === "petals" ? 30 : 20;
 
       for (let i = 0; i < count; i++) {
         particles.push({
@@ -477,21 +474,19 @@
           speedX: (Math.random() - 0.5) * 1.2,
           rotation: Math.random() * 360,
           rotSpeed: (Math.random() - 0.5) * 2,
-          color: type === "petals" ? (Math.random() > 0.5 ? "#fb7185" : "#facc15") // Hoa đào / mai
-                : type === "stars" ? "#fbbf24" // Sao vàng
-                : type === "flowers" ? "#c084fc" // Hoa tím/hồng tri ân
-                : "#f97316" // Đèn lồng cam
+          color: type === "petals" ? (Math.random() > 0.5 ? "#fb7185" : "#facc15")
+                : type === "stars" ? "#fbbf24"
+                : type === "flowers" ? "#c084fc"
+                : "#f97316"
         });
       }
 
       function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         particles.forEach(p => {
           p.y += p.speedY;
           p.x += p.speedX;
           p.rotation += p.rotSpeed;
-
           if (p.y > canvas.height) { p.y = -10; p.x = Math.random() * canvas.width; }
           if (p.x > canvas.width) p.x = 0;
           if (p.x < 0) p.x = canvas.width;
@@ -502,19 +497,16 @@
           ctx.fillStyle = p.color;
 
           if (type === "stars") {
-            // Vẽ ngôi sao
             ctx.beginPath();
             ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
             ctx.fill();
           } else {
-            // Vẽ cánh hoa / cánh đào
             ctx.beginPath();
             ctx.ellipse(0, 0, p.size, p.size / 1.8, 0, 0, Math.PI * 2);
             ctx.fill();
           }
           ctx.restore();
         });
-
         animationId = requestAnimationFrame(animate);
       }
       animate();
@@ -537,8 +529,9 @@ const firebaseConfig = {
   appId: "1:247432664150:web:20a46d338618746ebbd7f7",
   measurementId: "G-Z660E52LLW"
 };
+
     const TEACHER_EMAILS = [
-      "bluzzington1@gmail."
+      "bluzzington1@gmail.com"
     ];
 
     let auth = null;
@@ -597,14 +590,14 @@ const firebaseConfig = {
     }
 
     /* -------------------------------------------------------------
-       3. DỮ LIỆU ĐỀ THI MẪU (ĐỦ MỨC ĐỘ DỄ/VỪA/KHÓ & CÂU HỎI MỞ)
+       3. DỮ LIỆU ĐỀ THI MẪU (ĐỦ MỨC ĐỘ DỄ/VỪA/KHÓ)
        ------------------------------------------------------------- */
     let EXAMS_DATABASE = [
       {
         id: "de-thi-co-ban-easy",
         title: "Bài Thi Khảo Sát Cơ Bản: Everyday Life",
         category: "IELTS",
-        difficulty: "Easy", // MỨC ĐỘ DỄ
+        difficulty: "Easy",
         year: "2026",
         durationMinutes: 15,
         passage: `
@@ -621,8 +614,8 @@ const firebaseConfig = {
           },
           {
             id: 2,
-            type: "other", // DẠNG BÀI KHÁC / TỰ LUẬN MỞ
-            prompt: "Theo bạn, ngoài uống nước thì thói quen buổi sáng nào tốt cho sức khỏe? (Gõ câu trả lời ngắn của bạn):",
+            type: "other",
+            prompt: "Theo bạn, ngoài uống nước thì thói quen buổi sáng nào tốt cho sức khỏe? (Gõ câu trả lời ngắn):",
             correctAnswer: "Tập thể dục, đi dạo, ăn sáng đầy đủ",
             explanation: "Học sinh nêu được một thói quen lành mạnh bất kỳ là đạt điểm."
           }
@@ -632,7 +625,7 @@ const firebaseConfig = {
         id: "ielts-full-reading-demo",
         title: "IELTS Academic Reading: The Future of Renewable Energy",
         category: "IELTS",
-        difficulty: "Hard", // MỨC ĐỘ NÂNG CAO
+        difficulty: "Hard",
         year: "2026",
         durationMinutes: 20,
         passage: `
@@ -663,28 +656,25 @@ const firebaseConfig = {
       }
     ];
 
-    const savedExams = localStorage.getItem("prep_custom_exams_v3");
+    const savedExams = localStorage.getItem("prep_custom_exams_v4");
     if (savedExams) {
       try { EXAMS_DATABASE = JSON.parse(savedExams); } catch(e){}
     }
 
     /* -------------------------------------------------------------
-       4. HỆ THỐNG CHỐNG GIAN LẬN: CẢNH BÁO RỜI TAB (3 LẦN TỰ NỘP)
+       4. CHỐNG GIAN LẬN: SỬ DỤNG MODAL TRONG TRANG (KHÔNG DÙNG ALERT)
        ------------------------------------------------------------- */
     let tabSwitchViolations = 0;
     const MAX_VIOLATIONS = 3;
     let isInExam = false;
 
-    // Lắng nghe sự kiện học sinh chuyển tab hoặc bấm ra ngoài cửa sổ
-    document.addEventListener("visibilitychange", handleTabSwitch);
-    window.addEventListener("blur", handleTabSwitch);
-
-    function handleTabSwitch() {
-      // Chỉ kích hoạt khi học sinh đang trong phòng thi
+    // Chỉ dùng document.visibilitychange để chống gian lận chính xác nhất
+    document.addEventListener("visibilitychange", () => {
       if (!isInExam) return;
-      if (document.hidden || !document.hasFocus()) {
+      if (document.hidden) {
         tabSwitchViolations++;
 
+        // Cập nhật banner cảnh báo
         const warningBar = document.getElementById("cheat-warning-bar");
         const countText = document.getElementById("violation-count-text");
         if (warningBar && countText) {
@@ -693,12 +683,23 @@ const firebaseConfig = {
         }
 
         if (tabSwitchViolations >= MAX_VIOLATIONS) {
-          alert(`🚨 BẠN ĐÃ VI PHẠM RỜI MÀN HÌNH QUÁ 3 LẦN!\n\nHệ thống sẽ lập tức khóa bài và tự động nộp bài thi ngay bây giờ.`);
-          submitExam(true); // Tự động nộp bài thi vì gian lận
+          // Tự động nộp bài ngay lập tức khi đủ 3 lần
+          submitExam(true);
         } else {
-          alert(`⚠️ CẢNH BÁO VI PHẠM (Lần ${tabSwitchViolations}/${MAX_VIOLATIONS}):\n\nBạn vừa rời khỏi màn hình làm bài thi! Vui lòng quay lại ngay. Nếu chuyển tab thêm ${MAX_VIOLATIONS - tabSwitchViolations} lần nữa, bài thi sẽ bị TỰ ĐỘNG NỘP!`);
+          // Hiện modal cảnh báo trong trang
+          const modal = document.getElementById("cheat-modal");
+          const modalCount = document.getElementById("cheat-modal-count");
+          if (modal && modalCount) {
+            modalCount.innerText = tabSwitchViolations;
+            modal.classList.remove("hidden");
+          }
         }
       }
+    });
+
+    function dismissCheatWarning() {
+      const modal = document.getElementById("cheat-modal");
+      if (modal) modal.classList.add("hidden");
     }
 
     /* -------------------------------------------------------------
@@ -716,7 +717,7 @@ const firebaseConfig = {
       currentQuestionIdx = 0;
       userAnswers = {};
       flaggedQuestions.clear();
-      tabSwitchViolations = 0; // Đặt lại bộ đếm vi phạm
+      tabSwitchViolations = 0;
       isInExam = true;
 
       const warningBar = document.getElementById("cheat-warning-bar");
@@ -836,17 +837,14 @@ const firebaseConfig = {
           </div>
         `;
       } else if (q.type === 'other') {
-        // DẠNG BÀI KHÁC / TỰ LUẬN MỞ
         const val = userAnswers[q.id] || '';
         inputHtml = `
           <div class="mt-4">
-            <label class="block text-xs font-bold text-slate-500 mb-2">Nhập bài làm tự luận / câu trả lời của bạn vào khung bên dưới:</label>
             <textarea rows="4" oninput="saveAnswer(${q.id}, this.value)" placeholder="Gõ câu trả lời chi tiết của bạn tại đây..." 
               class="w-full p-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:border-brand-500 focus:bg-white outline-none transition">${val}</textarea>
           </div>
         `;
       } else {
-        // TRẮC NGHIỆM ABCD
         inputHtml = `
           <div class="space-y-2.5 mt-4">
             ${(q.options || []).map((opt, oIdx) => `
@@ -885,7 +883,7 @@ const firebaseConfig = {
        ------------------------------------------------------------- */
     function submitExam(forcedByCheating = false) {
       clearInterval(timerInterval);
-      isInExam = false; // Tắt chế độ phòng thi
+      isInExam = false;
 
       let correctCount = 0;
       const detailsContainer = document.getElementById('result-details-container');
@@ -906,7 +904,6 @@ const firebaseConfig = {
             isCorrect = accepted.some(a => a.toLowerCase().trim() === userAns.toLowerCase().trim());
           }
         } else if (q.type === 'other') {
-          // Dạng bài khác: Nếu có trả lời tính đúng hoặc chờ giáo viên chấm
           isCorrect = userAns && userAns.trim().length > 0;
         } else {
           isCorrect = (userAns !== undefined && Number(userAns) === q.correctAnswer);
@@ -934,7 +931,7 @@ const firebaseConfig = {
             <span class="text-xs font-black px-2 py-0.5 rounded ${isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}">${isCorrect ? 'ĐÚNG' : 'SAI'}</span>
           </div>
           <div class="text-xs text-slate-600 mt-2"><strong>Bạn trả lời:</strong> <span class="${isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}">${displayUserAns}</span></div>
-          <div class="text-xs text-emerald-700 mt-1"><strong>Đáp án chuẩn / Gợi ý:</strong> ${displayCorrectAns}</div>
+          <div class="text-xs text-emerald-700 mt-1"><strong>Đáp án chuẩn:</strong> ${displayCorrectAns}</div>
           <div class="text-xs bg-white p-2.5 rounded-lg border border-slate-200 mt-2 text-slate-700"><strong>Dẫn chứng:</strong> ${q.explanation || 'Không có giải thích.'}</div>
         `;
         detailsContainer.appendChild(card);
@@ -958,7 +955,6 @@ const firebaseConfig = {
       if (forcedByCheating) violationBadge.classList.remove('hidden');
       else violationBadge.classList.add('hidden');
 
-      // Lưu lên Firestore
       if (db && currentUser) {
         db.collection("submissions").add({
           studentName: currentUser.displayName || "Ẩn danh",
@@ -1147,7 +1143,7 @@ const firebaseConfig = {
       const title = document.getElementById('builder-exam-title').value.trim();
       const category = document.getElementById('builder-exam-category').value;
       const duration = parseInt(document.getElementById('builder-exam-duration').value) || 45;
-      const level = document.getElementById('builder-exam-level').value; // Easy / Medium / Hard
+      const level = document.getElementById('builder-exam-level').value;
       const passageText = document.getElementById('builder-exam-passage').value.trim();
 
       if (!title) {
@@ -1255,7 +1251,7 @@ const firebaseConfig = {
       if (existIdx >= 0) EXAMS_DATABASE[existIdx] = examData;
       else EXAMS_DATABASE.unshift(examData);
 
-      localStorage.setItem("prep_custom_exams_v3", JSON.stringify(EXAMS_DATABASE));
+      localStorage.setItem("prep_custom_exams_v4", JSON.stringify(EXAMS_DATABASE));
       alert(`🎉 Đã lưu đề thi thành công!`);
       closeExamModal();
       renderExamList();
@@ -1264,7 +1260,7 @@ const firebaseConfig = {
     function deleteExam(examId, examTitle) {
       if (confirm(`Bạn có chắc muốn xóa đề thi "${examTitle}" không?`)) {
         EXAMS_DATABASE = EXAMS_DATABASE.filter(e => e.id !== examId);
-        localStorage.setItem("prep_custom_exams_v3", JSON.stringify(EXAMS_DATABASE));
+        localStorage.setItem("prep_custom_exams_v4", JSON.stringify(EXAMS_DATABASE));
         alert("Đã xóa đề thi!");
         renderExamList();
       }
@@ -1290,7 +1286,6 @@ const firebaseConfig = {
         const card = document.createElement('div');
         card.className = "bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between";
 
-        // Màu sắc phân biệt độ khó: Dễ (Xanh lá) - Vừa (Vàng cam) - Khó (Đỏ hồng)
         const levelBadge = exam.difficulty === 'Easy' 
           ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">🟢 Dễ (Easy)</span>'
           : exam.difficulty === 'Medium'
@@ -1465,10 +1460,9 @@ const firebaseConfig = {
       renderExamList();
     }
 
-    // Nạp giao diện lễ hội đã lưu (nếu có)
+    // Khởi động Theme lễ hội và nạp danh sách đề thi
     const savedTheme = localStorage.getItem("prep_holiday_theme") || "default";
     applyTheme(savedTheme);
-
     renderExamList();
   </script>
 </body>
